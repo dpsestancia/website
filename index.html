@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dharma Paripalana Samithi Estancia</title>
+    <style>
+        :root {
+            --saffron: #FF9933;
+            --deep-saffron: #FF6600;
+            --maroon: #800000;
+            --gold: #D4AF37;
+            --cream: #fffaf0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            background-color: var(--cream);
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* Header */
+        header {
+            background: white;
+            padding: 20px 5%;
+            display: flex;
+            align-items: center;
+            border-bottom: 4px solid var(--saffron);
+        }
+
+        .logo { height: 90px; margin-right: 20px; }
+        .trust-title h1 { margin: 0; color: var(--maroon); font-size: 1.7rem; }
+        .trust-title p { margin: 5px 0 0; color: var(--deep-saffron); font-weight: bold; }
+
+        /* Navigation */
+        nav {
+            background: var(--maroon);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+        }
+
+        nav button {
+            background: none;
+            border: none;
+            color: white;
+            padding: 15px 25px;
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+
+        nav button:hover, nav button.active {
+            background: var(--deep-saffron);
+        }
+
+        /* Content Sections */
+        .content-section {
+            display: none;
+            padding: 40px 5%;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .content-section.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        h2.section-title {
+            text-align: center;
+            color: var(--maroon);
+            border-bottom: 2px solid var(--gold);
+            padding-bottom: 10px;
+            margin: 40px 0 20px 0;
+        }
+
+        /* Home Style */
+        .intro-box {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            max-width: 900px;
+            margin: 0 auto;
+            border-left: 8px solid var(--saffron);
+        }
+
+        /* Slideshow */
+        .slideshow-container {
+            max-width: 100%;
+            position: relative;
+            margin: 30px auto;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            border: 4px solid white;
+        }
+        .mySlides { display: none; }
+        .fade { animation: fadeAnim 1.5s; }
+        @keyframes fadeAnim { from {opacity: .4} to {opacity: 1} }
+        .slide-text {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            text-align: center;
+            background: rgba(128, 0, 0, 0.7);
+            color: white;
+            padding: 10px 0;
+            font-weight: bold;
+        }
+
+        /* Tables */
+        .table-container { overflow-x: auto; background: white; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 30px; }
+        table { width: 100%; border-collapse: collapse; min-width: 800px; }
+        th { background: var(--saffron); color: white; padding: 15px; text-align: left; }
+        td { padding: 15px; border-bottom: 1px solid #eee; font-size: 0.95rem; }
+        tr:nth-child(even) { background-color: #fef9f3; }
+        .highlight-text { color: var(--deep-saffron); font-weight: bold; }
+        .donation-highlight { color: #27ae60; font-weight: bold; }
+
+        /* Leadership Grid */
+        .leadership-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+        .card { background: white; padding: 25px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border-top: 5px solid var(--maroon); }
+        .name-item { padding: 5px 0; border-bottom: 1px inset #fafafa; display: flex; justify-content: space-between; }
+        .role { color: var(--deep-saffron); font-weight: bold; font-size: 0.85rem; }
+
+        /* Donate Grid */
+        .donation-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 20px; }
+        .bank-details { background: white; padding: 30px; border-radius: 10px; border: 1px solid #ddd; }
+        .qr-card { background: white; padding: 20px; border-radius: 10px; text-align: center; border: 1px solid #ddd; }
+        .qr-card img { width: 100%; max-width: 250px; margin-top: 10px; }
+
+        .btn-link {
+            background: var(--maroon);
+            color: white;
+            padding: 12px 25px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            display: inline-block;
+            margin-top: 20px;
+        }
+
+        footer { background: #222; color: white; text-align: center; padding: 40px 5%; margin-top: 50px; }
+        footer a { color: var(--saffron); text-decoration: none; }
+
+        @media (max-width: 768px) { .leadership-grid, .donation-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+<header>
+    <img src="logo.png" alt="Trust Logo" class="logo" onerror="this.src='https://via.placeholder.com/90?text=DPS+Logo'">
+    <div class="trust-title">
+        <h1>Dharma Paripalana Samithi Estancia</h1>
+        <p>Religious and Charitable Institution</p>
+    </div>
+</header>
+
+<nav id="mainNav">
+    <button class="active" onclick="openTab(event, 'home')">Home</button>
+    <button onclick="openTab(event, 'activities')">Activities Record</button>
+    <button onclick="openTab(event, 'about')">About Us</button>
+    <button onclick="openTab(event, 'donate')">Donate</button>
+</nav>
+
+<div id="home" class="content-section active">
+    <div class="intro-box">
+        <h2 style="color:var(--maroon); margin-top: 0;">Welcome</h2>
+        <p>Dharma Paripalana Samithi Estancia is a <strong>religious and charitable institution founded in 2021</strong>. It is managed by trustees comprising of <strong>Estancia complex flat owners</strong> with varied experience dedicated to promoting and spreading the values of <strong>Sanathana Dharma</strong>.</p>
+        
+        <div class="slideshow-container">
+            <div class="mySlides fade">
+                <img src="highlight1.jpg" style="width:100%" onerror="this.src='https://via.placeholder.com/800x400?text=Devotional+Highlights'">
+                <div class="slide-text">Spiritual Discourses & Bhajans</div>
+            </div>
+            <div class="mySlides fade">
+                <img src="highlight2.jpg" style="width:100%" onerror="this.src='https://via.placeholder.com/800x400?text=Annadanam+Events'">
+                <div class="slide-text">Selfless Service: Annadhanam</div>
+            </div>
+            <div class="mySlides fade">
+                <img src="highlight3.jpg" style="width:100%" onerror="this.src='https://via.placeholder.com/800x400?text=Trust+Charity'">
+                <div class="slide-text">Supporting Sanathana Dharma</div>
+            </div>
+            <div class="mySlides fade">
+                <img src="highlight4.jpg" style="width:100%" onerror="this.src='https://via.placeholder.com/800x400?text=Devotional+Highlights'">
+                <div class="slide-text">Spiritual Discourses & Bhajans</div>
+            </div>
+            <div class="mySlides fade">
+                <img src="highlight5.jpg" style="width:100%" onerror="this.src='https://via.placeholder.com/800x400?text=Annadanam+Events'">
+                <div class="slide-text">Selfless Service: Annadhanam</div>
+            </div>
+            <div class="mySlides fade">
+                <img src="highlight6.jpg" style="width:100%" onerror="this.src='https://via.placeholder.com/800x400?text=Trust+Charity'">
+                <div class="slide-text">Supporting Sanathana Dharma</div>
+            </div>
+        </div>
+
+        <p>Our mission is fulfilled by organising bhajans, poojas, discourses, dharmic activities, cultural events and <strong>Annadhanam</strong> to all participants.</p>
+        
+        <div style="text-align: center; border-top: 1px solid #eee; padding-top: 20px;">
+            <h4 style="margin: 0; color: var(--maroon);">Visual Highlights</h4>
+            <a href="https://photos.google.com/share/AF1QipP1hNRUNs-ddF6Q4jpKRxLnoTu6nbh79JAce5oShjGWyoHQYUYLYEn3VGyDW3E7Qg/memory/AF1QipMBcsBuhCRDDSZ0n83ADq9jpkxepRnyhGsBgjWh75-4_6RQPQGLwb_YiPwMRtRGYA?key=TkFGV29jR2NnZ2IxMHFIbGdhTjJqQjBQWVMyUHlB" target="_blank" class="btn-link">View Full Activities Album</a>
+        </div>
+    </div>
+</div>
+
+<div id="activities" class="content-section">
+    <h2 class="section-title">Periodic / Monthly Activities</h2>
+    <div class="table-container">
+        <table>
+            <thead><tr><th>Frequency</th><th>Activity Details</th><th>Venue</th></tr></thead>
+            <tbody>
+                <tr><td>Since Aug 2023</td><td>Monthly donation of <span class="donation-highlight">Rs. 3,000/-</span> to Sri Chaturveda Vidhya Ganapathi Veda Shastra Maha Vidyasthan.</td><td>Athur Chengalpattu</td></tr>
+                <tr><td>Since Aug 2022</td><td>Monthly Pradosham and Sankatahara Chathurthi poojas with Vedic chanting and annadhanam.</td><td>Vidya Mandir Ganapathi temple @ Estancia</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2 class="section-title">Event History (Recent First)</h2>
+    <div class="table-container">
+        <table>
+            <thead><tr><th>Date</th><th>Activity Details</th><th>Venue</th></tr></thead>
+            <tbody>
+                <tr><td>25 Dec 2025</td><td>Sri Dharmasastha Preeti Utsavam; <span class="highlight-text">Chakkamkulangara Bhajana Samithi troupe</span>. Annadhanam (350).</td><td>Estancia Club house hall</td></tr>
+                <tr><td>12 Oct 2025</td><td>Donation of <span class="donation-highlight">Rs. 16,001/-</span> to SCVG Trust.</td><td>Athur Chengalpattu</td></tr>
+                <tr><td>27 Aug 2025</td><td>Vinayaka Chathurthi utsavam & annadhanam (100).</td><td>Vidya Mandir Temple @ Estancia</td></tr>
+                <tr><td>19 Apr 2025</td><td>Sri Ramanavami; Nama sankeertanam by <span class="highlight-text">Shri Srinathdass Maharaj</span>.</td><td>Estancia Club house hall</td></tr>
+                <tr><td>12 Jan 2025</td><td>Veedhi bhajan by <span class="highlight-text">Smt. Suchitra Balasubramanian</span>.</td><td>Vidya Mandir & Estancia Road</td></tr>
+                <tr><td>25 Dec 2024</td><td>Sri Dharmasastha Preeti Utsavam; <span class="highlight-text">Sri. Veeramani Raju</span>.</td><td>Estancia Club house hall</td></tr>
+                <tr><td>23 Oct 2024</td><td>Donation of <span class="donation-highlight">Rs. 42,001/-</span> to SCVG Trust.</td><td>Athur Chengalpattu</td></tr>
+                <tr><td>07 Sep 2024</td><td>Vinayaka Chathurthi utsavam & annadhanam.</td><td>Vidya Mandir Temple @ Estancia</td></tr>
+                <tr><td>08 Mar 2024</td><td>Maha Shivarathiri; Ekadasa Rudram chanting by SMART team.</td><td>Estancia Clubhouse hall</td></tr>
+                <tr><td>25 Dec 2023</td><td>Sri Dharmasastha Preeti Utsavam; <span class="highlight-text">Sri. Veeramani Raju</span>.</td><td>Estancia Club house hall</td></tr>
+                <tr><td>01 Oct 2023</td><td>Gokulashtami; Discourse by <span class="highlight-text">Sri Dushyanth Sridhar</span>.</td><td>Estancia Club House Hall</td></tr>
+                <tr><td>16 July 2023</td><td>Rudhrabhishekam at 1300-year-old Siva Temple.</td><td>Kinar village</td></tr>
+                <tr><td>31 Mar 2023</td><td>Sriramanavami; Donation of <span class="donation-highlight">Rs.5,000/-</span> to Sri Seetha Rama Trust.</td><td>Estancia Club House Hall</td></tr>
+                <tr><td>25 Feb 2023</td><td>Musical discourse by <span class="highlight-text">Smt. B. Suchitra & team</span>.</td><td>Estancia Club House Hall</td></tr>
+                <tr><td>18 Feb 2023</td><td>Mahasivarathri pooja & annadhanam.</td><td>Vidya Mandir Temple @ Estancia</td></tr>
+                <tr><td>28 Jan 2023</td><td>Samvatsara abhisegam; Donation of <span class="donation-highlight">Rs. 49,000/-</span> to Vidya Mandir school.</td><td>Vidya Mandir Temple @ Estancia</td></tr>
+                <tr><td>05 Dec 2021</td><td>Sri Sastha Preeti Utsavam; Bhajans by <span class="highlight-text">Sri Veeramanidasan</span>.</td><td>Estancia Club House Hall</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div id="about" class="content-section">
+    <h2 class="section-title">Trust Leadership</h2>
+    <div class="leadership-grid">
+        <div class="card">
+            <h3>Office Bearers</h3>
+            <div class="name-item"><strong>Sri. Rammohan</strong><span class="role">Managing Trustee</span></div>
+            <div class="name-item">Sri. Gurumurthy<span class="role">Deputy Managing Trustee</span></div>
+            <div class="name-item">Sri. A.S.Prasad<span class="role">Secretary</span></div>
+            <div class="name-item">Sri. Ramesh Jayaram<span class="role">Treasurer</span></div>
+            <div class="name-item">Sri. Rajakumar<span class="role">Joint Treasurer</span></div>
+            <div class="name-item">Sri. K.V.Suresh<span class="role">Author</span></div>
+        </div>
+        <div class="card">
+            <h3>Trustees</h3>
+            <div class="name-item">Sri. Kousik Ganesh</div><div class="name-item">Sri. Sabarirajan</div>
+            <div class="name-item">Sri. Pattabhiraman</div><div class="name-item">Sri. Krishnan</div>
+            <div class="name-item">Sri. Venkata Krishnan</div><div class="name-item">Sri. Ganesan</div>
+            <div class="name-item">Sri. BhagavanDoss</div><div class="name-item">Sri. Velavan</div>
+            <div class="name-item">Sri. Sivakumar</div><div class="name-item">Sri. Narayanan</div>
+        </div>
+    </div>
+    <div class="card" style="margin-top:20px; text-align: center; border-top-color: var(--gold);">
+        <h3>Legal & Strategic Advisor</h3>
+        <p><strong>Sri. Rajib Hota</strong> (Retd. Income tax Commissioner)</p>
+    </div>
+</div>
+
+<div id="donate" class="content-section">
+    <h2 class="section-title">Donations & Support</h2>
+    <div class="donation-grid">
+        <div class="bank-details">
+            <h3 style="color: var(--maroon); margin-top: 0;">Bank Account</h3>
+            <p><strong>Account Name:</strong> Dharma Paripalana Samithi</p>
+            <p><strong>Account Number:</strong> 500101013016821</p>
+            <p><strong>IFSC Code:</strong> CIUB0000336</p>
+            <p><strong>Bank:</strong> City Union Bank, Guduvanchery Branch</p>
+            <hr style="border:0; border-top:1px solid #eee; margin:15px 0;">
+            <p><strong>UPI ID:</strong> <span class="highlight-text">EZE0098780@CUB</span></p>
+        </div>
+        <div class="qr-card">
+            <h3>Scan & Pay</h3>
+            <img src="qr-code.png" alt="Scan QR Code" onerror="this.src='https://via.placeholder.com/250?text=Scan+QR+Code'">
+        </div>
+    </div>
+</div>
+
+<footer>
+    <div style="max-width: 1100px; margin: 0 auto; text-align: left; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px;">
+        <div>
+            <h4 style="color: var(--saffron);">Official Address</h4>
+            <p style="font-size: 0.9rem;"># 5137 Estancia Apartments, Tower #5,<br>GST Road, Vallanchery, Guduvanchery (PO),<br>Tamil Nadu - 603202.</p>
+        </div>
+        <div>
+            <h4 style="color: var(--saffron);">Connect</h4>
+            <p style="font-size: 0.9rem;"><strong>Email:</strong> dps.info@zohomail.in | dps.estancia@gmail.com<br>
+            <strong>Phone:</strong> +91-98407 18054</p>
+        </div>
+    </div>
+    <p style="font-size: 0.8rem; margin-top: 30px;">© 2026 Dharma Paripalana Samithi Estancia. All Rights Reserved.</p>
+</footer>
+
+<script>
+    function openTab(evt, tabName) {
+        var i, content, tablinks;
+        content = document.getElementsByClassName("content-section");
+        for (i = 0; i < content.length; i++) { content[i].classList.remove("active"); }
+        tablinks = document.getElementsByTagName("button");
+        for (i = 0; i < tablinks.length; i++) { tablinks[i].classList.remove("active"); }
+        document.getElementById(tabName).classList.add("active");
+        evt.currentTarget.classList.add("active");
+        window.scrollTo(0,0);
+    }
+
+    let slideIndex = 0;
+    function showSlides() {
+        let i;
+        let slides = document.getElementsByClassName("mySlides");
+        for (i = 0; i < slides.length; i++) { slides[i].style.display = "none"; }
+        slideIndex++;
+        if (slideIndex > slides.length) {slideIndex = 1}    
+        if(slides.length > 0) slides[slideIndex-1].style.display = "block";  
+        setTimeout(showSlides, 4000);
+    }
+    window.onload = function() { showSlides(); };
+</script>
+
+</body>
+</html>
