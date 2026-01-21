@@ -113,6 +113,63 @@
         grid-template-columns: 1fr;
     }
 }
+.media-link-btn {
+    display: inline-block;
+    padding: 15px 25px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+    color: white;
+    transition: transform 0.2s;
+    text-align: center;
+}
+
+.media-link-btn:hover {
+    transform: scale(1.05);
+}
+
+.gp-btn { background-color: #4285F4; } /* Google Blue */
+.gd-btn { background-color: #34A853; } /* Google Green */
+.calendar-grid-layout {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.month-card {
+    background: #fff;
+    border: 1px solid var(--saffron);
+    border-top: 5px solid var(--maroon); /* Maroon header accent */
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.month-card h4 {
+    margin: 0 0 10px 0;
+    color: var(--maroon);
+    text-align: center;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+}
+
+.month-card ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.month-card li {
+    padding: 5px 0;
+    font-size: 0.85rem;
+    border-bottom: 1px solid #f9f9f9;
+}
+
+.month-card li:last-child {
+    border-bottom: none;
+}
     </style>
 </head>
 <body>
@@ -139,7 +196,6 @@
             <h2 id="slide-caption">Promoting Sanatana Dharma</h2>
         </div>
     </div>
-
     <div class="container">
         <div class="home-grid">
             <div class="about-section">
@@ -153,54 +209,35 @@
                 <div style="margin-top: 25px;">
                     <button onclick="switchTab('activities')" style="background: var(--maroon); color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">View Activity Calendar</button>
                 </div>
-            </div>
-
+            </div>  
             <div class="info-sidebar">
-                <div class="sidebar-box upcoming-box">
-    <h3>📅 Events & Activities</h3>
+                <div class="sidebar-box">
+                <div id="special-sidebar-section">
+                    <h3 style="margin-bottom: 10px;">📅 Special Events</h3>
+                    <ul id="upcoming-specials-list" style="list-style: none; padding: 0; margin: 0 0 20px 0;">
+                    </ul>
+                </div>
+
+                <hr style="border: 0; border-top: 1px dashed var(--saffron); margin: 15px 0;">
+
+                <div id="monthly-sidebar-section">
+                    <h3 style="margin-bottom: 10px;">🕉️ Next Monthly Poojas</h3>
+                    <ul id="next-monthly-list" style="list-style: none; padding: 0; margin: 0;">
+                    </ul>
+                </div>
+                </div>
     
-    <div style="margin-bottom: 15px;">
-        <span style="font-size: 0.8rem; color: #888; text-transform: uppercase; font-weight: bold;">Upcoming Specials</span>
-        <ul id="upcoming-list" style="list-style: none; padding: 0; margin: 0;">
-            </ul>
-    </div>
-
-    <div style="border-top: 1px dashed var(--saffron); padding-top: 10px;">
-        <span style="font-size: 0.8rem; color: #888; text-transform: uppercase; font-weight: bold;">Monthly Regulars</span>
-        <ul id="monthly-sidebar-list" style="list-style: none; padding: 0; margin: 0;">
-            </ul>
-    </div>
-
-    <div style="margin-top: 20px; text-align: center;">
-        <a href="https://youtube.com/channel/UCQKjmSJNNT15ScwyXr3_AhA" target="_blank" 
-           style="display: flex; align-items: center; justify-content: center; background: #FF0000; color: white; padding: 10px; text-decoration: none; border-radius: 5px; font-weight: bold; font-size: 0.85rem;">
-           <img src="https://upload.wikimedia.org/wikipedia/commons/0/09/YouTube_full-color_icon_%282017%29.svg" style="width:20px; margin-right:8px;">
-           Watch on YouTube
-        </a>
-    </div>
-</div>
                 <div class="sidebar-box highlights-box">
                     <h3>✨ Recent Highlights</h3>
                     <div id="mini-gallery" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-                        </div>
+                    </div>
                     <button onclick="switchTab('activities')" style="width: 100%; margin-top: 10px; background: none; border: 1px solid var(--maroon); color: var(--maroon); font-size: 0.8rem; cursor: pointer;">View All Photos</button>
                 </div>
             </div>
         </div>
     </div>
 </div>
-<div id="home1" class="tab-content active">
-    <div id="slideshow-box">
-        <div class="hero-overlay">
-            <h2 id="slide-caption">Promoting Sanatana Dharma</h2>
-        </div>
-    </div>
-    <div class="container" style="text-align:center;">
-        <h2 style="color:var(--maroon);">Welcome to the Samithi</h2>
-        <p>Managed by Estancia residents to foster spiritual values through Bhajans, Poojas, and Annadhanam.</p>
-        <a href="https://photos.app.goo.gl/YourActualLinkHere" target="_blank" style="display:inline-block; margin-top:15px; background:var(--maroon); color:white; padding:12px 25px; text-decoration:none; border-radius:5px; font-weight:bold;">VIEW ALL PHOTO HIGHLIGHTS</a>
-    </div>
-</div>
+
 <div id="activities" class="tab-content">
     <div class="container">
         <div style="text-align: right; margin-bottom: 20px;">
@@ -208,64 +245,47 @@
                 📝 REGISTER FOR SANKALPAM
             </a>
         </div>
-        <h2 style="color:var(--maroon); border-left: 5px solid var(--saffron); padding-left: 15px;">Monthly / Periodic Activities</h2>
-        <p style="font-style: italic; color: #666; margin-bottom: 10px;">Ongoing spiritual and charitable activities conducted every month.</p>
-        <table>
-            <thead>
-                <tr><th>Schedule</th><th>Activity Detail</th><th>Venue</th></tr>
-            </thead>
-            <tbody id="monthly-list"></tbody>
-        </table>
+        <section id="monthly-calendar-section" style="margin-top: 50px; margin-bottom: 50px;">
+            <h2 style="color:var(--maroon); border-left: 5px solid var(--saffron); padding-left: 15px;">🗓️ 2026 Monthly Pooja Calendar</h2>
+            <p style="margin-bottom: 20px; color: #666; font-style: italic;">Detailed monthly dates for Pradosham and Sankatahara Chaturthi.</p>
+            
+            <div id="calendar-grid" class="calendar-grid-layout">
+                </div>
+        </section>
 
         <h2 style="color:var(--maroon); border-left: 5px solid var(--saffron); padding-left: 15px; margin-top: 50px;">Special Events & Yearly Calendar</h2>
         <table>
             <thead>
-                <tr><th>Date/Occasion</th><th>Activity Detail</th><th>Venue</th></tr>
+                <tr><th>Date/Occasion</th><th>Activity Detail</th><th>Venue</th><th>Media</th></tr>
             </thead>
             <tbody id="yearly-list"></tbody>
         </table>
 
         <div id="sankalpam-section" style="margin-top: 40px; padding: 25px; background: #fffcf8; border: 2px solid var(--saffron); border-radius: 10px; scroll-margin-top: 80px;">
-    <h3 style="color: var(--maroon); margin-top: 0; border-bottom: 1px solid var(--saffron); padding-bottom: 10px;">
-        Family Sankalpam Registration
-    </h3>
-    <p>New members are requested to provide their family details (Gothram, Nakshatram, etc.) for our permanent records.</p>
+            <h3 style="color: var(--maroon); margin-top: 0; border-bottom: 1px solid var(--saffron); padding-bottom: 10px;">
+            Family Sankalpam Registration
+            </h3>
+            <p>New members are requested to provide their family details (Gothram, Nakshatram, etc.) for our permanent records.</p>
+            <div class="jotform-container" style="width: 100%; min-height: 550px;">
+                <iframe
+                id="JotFormIFrame-222271804667054"
+                title="Sankalpam"
+                onload="window.parent.scrollTo(0,0)"
+                allowtransparency="true"
+                allow="geolocation; microphone; camera; fullscreen; payment"
+                src="https://form.jotform.com/222271804667054"
+                frameborder="0"
+                style="min-width:100%;max-width:100%;height:539px;border:none;"
+                scrolling="no">
+                </iframe>
+                <script src='https://cdn.jotfor.ms/s/umd/latest/for-form-embed-handler.js'></script>
+                <script>window.jotformEmbedHandler("iframe[id='JotFormIFrame-222271804667054']", "https://form.jotform.com/")</script>
+            </div>
     
-    <div class="jotform-container" style="width: 100%; min-height: 550px;">
-
-    <iframe
-      id="JotFormIFrame-222271804667054"
-      title="Sankalpam"
-      onload="window.parent.scrollTo(0,0)"
-      allowtransparency="true"
-      allow="geolocation; microphone; camera; fullscreen; payment"
-      src="https://form.jotform.com/222271804667054"
-      frameborder="0"
-      style="min-width:100%;max-width:100%;height:539px;border:none;"
-      scrolling="no"
-    >
-    </iframe>
-    <script src='https://cdn.jotfor.ms/s/umd/latest/for-form-embed-handler.js'></script>
-    <script>window.jotformEmbedHandler("iframe[id='JotFormIFrame-222271804667054']", "https://form.jotform.com/")</script>
-    </div>
-    
-    <div style="text-align: right; margin-top: 10px;">
-        <a href="#navbar" style="font-size: 0.8rem; color: var(--maroon); text-decoration: none;">↑ Back to Top</a>
-    </div>
-</div>
-        
-</div>
-    </div>
-</div>
-<div id="activities1" class="tab-content">
-    <div class="container">
-        <h2 style="color:var(--maroon); border-left: 5px solid var(--saffron); padding-left: 15px;">Trust Activity Log</h2>
-        <table>
-            <thead>
-                <tr><th>Date</th><th>Activity Detail</th><th>Venue</th></tr>
-            </thead>
-            <tbody id="event-list"></tbody>
-        </table>
+            <div style="text-align: right; margin-top: 10px;">
+                <a href="#navbar" style="font-size: 0.8rem; color: var(--maroon); text-decoration: none;">↑ Back to Top</a>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -410,6 +430,7 @@
     // --- APP STATE ---
 const config = {
     events: 'data/events.csv',
+    monthly_events: 'data/monthly_events.csv',
     trustees: 'data/trustees.csv',
     manifest: 'data/manifest.csv',
     highlightsDir: 'highlights/',
@@ -473,11 +494,22 @@ if (upcomingContainer && monthlySidebar) {
 
     // Render Specials with your requested formatting
     upcomingContainer.innerHTML = specials.map(row => {
-        const d = new Date(row[0].trim());
-        const formatted = d.toLocaleDateString('en-GB', { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/,/g, '');
-        return `<li style="padding:5px 0; font-size:0.85rem;"><strong style="color:var(--maroon);">${formatted}</strong><br>${row[1]}</li>`;
-    }).join('') || "<li>Stay tuned for updates!</li>";
+    const d = new Date(row[0].trim());
+    
+    // Updated options for: "Wednesday January 21 2026"
+    const formatted = d.toLocaleDateString('en-GB', { 
+        weekday: 'long', 
+        month: 'long', 
+        day: 'numeric', 
+        year: 'numeric' 
+    }).replace(/,/g, ''); // Removes the comma if the browser adds one
 
+    return `
+        <li style="padding:5px 0; font-size:0.85rem; border-bottom: 1px solid #eee;">
+            <strong style="color:var(--maroon);">${formatted}</strong><br>
+            ${row[1]}
+        </li>`;
+    }).join('') || "<li>Stay tuned for updates!</li>";
     // Render Regulars
     monthlySidebar.innerHTML = regulars.map(row => 
         `<li style="padding:5px 0; font-size:0.85rem;"><strong style="color:#555;">${row[0]}:</strong> ${row[1]}</li>`
@@ -496,12 +528,54 @@ if (upcomingContainer && monthlySidebar) {
 
     // 3. Existing logic for the full Tables (Monthly/Yearly)
     renderEventTables(events); // (Assuming you grouped your table logic here)
+    renderSpecialEvents(events);
+
+    // 2. Fetch the Monthly Calendar (The file you just created)
+        const calendarRes = await fetch(config.monthly_events);
+        const calendarText = await calendarRes.text();
+        
+        // Clean the data: remove empty lines and split into rows
+        const calendarRows = calendarText.split('\n').filter(row => row.trim() !== '');
+
+        // 3. CALL THE FUNCTIONS HERE
+        // This updates the "Next 3" in the sidebar
+        updateSidebar(calendarRows); 
+        
+        // This generates the 12-month grid in the main body
+    renderMonthWiseView(calendarRows);
+    //updateSidebar();
 
     // 4. Existing logic for the Trustees
     renderTrustees(trustees);
 
     // 5. Existing logic for the main Hero Slideshow
     startHeroSlideshow(photoData);
+    
+}
+async function loadMonthlySidebar() {
+    const response = await fetch('data/monthly_calendar.csv');
+    const data = await response.text();
+    const rows = data.split('\n').slice(1); // Skip header
+    const now = new Date();
+    now.setHours(0,0,0,0); // Reset time for accurate comparison
+
+    const upcoming = rows
+        .map(row => row.split(','))
+        .filter(cols => cols.length === 2)
+        .map(cols => ({ date: new Date(cols[0].trim()), name: cols[1].trim() }))
+        .filter(item => item.date >= now) // Future only
+        .sort((a, b) => a.date - b.date) // Soonest first
+        .slice(0, 3); // Get next 3
+
+    const container = document.getElementById('next-monthly-list');
+    container.innerHTML = upcoming.map(item => `
+        <li style="margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px;">
+            <span style="font-size: 0.75rem; color: #888; display: block;">
+                ${item.date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
+            </span>
+            <strong>${item.name}</strong>
+        </li>
+    `).join('') || "<li>Dates to be announced</li>";
 }
     async function renderEventTables(events) {
         const monthlyTable = document.getElementById('monthly-list');
@@ -519,6 +593,39 @@ if (upcomingContainer && monthlySidebar) {
             }
         });
     }
+ async function renderSpecialEvents(events) {
+    const tableBody = document.getElementById('yearly-list');
+    if (!tableBody) return;
+
+    // 1. Filter for 'Yearly' and sort in DECREASING order
+    const specialEvents = events.slice(1)
+        .filter(row => row[3] && row[3].trim().toLowerCase() === 'yearly')
+        .sort((a, b) => new Date(b[0]) - new Date(a[0])); // b - a for Descending
+
+    tableBody.innerHTML = specialEvents.map(row => {
+        const d = new Date(row[0].trim());
+        
+        // 2. Format to "21 January 2026"
+        let formattedDate = "Invalid Date";
+        if (!isNaN(d)) {
+            formattedDate = d.toLocaleDateString('en-GB', { 
+                day: 'numeric', 
+                month: 'long', 
+                year: 'numeric' 
+            });
+        }
+
+        return `
+            <tr>
+                <td style="white-space: nowrap;"><strong>${formattedDate}</strong></td>
+                <td>${row[1]}</td>
+                <td>${row[2]}</td>
+                <td>
+                    ${row[4] ? `<button onclick="toggleMedia('${row[4].trim()}')" class="media-btn">View Media</button>` : '<span style="color:#ccc;">-</span>'}
+                </td>
+            </tr>`;
+    }).join('');
+}
     async function renderTrustees(trustees) {
         // 3. Load Trustees
        // const trustees = await loadCSV(config.trustees);
@@ -759,6 +866,192 @@ function updateCount() {
         counter.style.color = "#666";
         counter.style.fontWeight = "normal";
     }
+}
+async function toggleMedia(mediaString) {
+    const btn = event.target;
+    const currentRow = btn.closest('tr');
+    
+    // Create a safe ID for the toggle row without breaking the actual data
+    const safeId = btoa(mediaString).substring(0, 16).replace(/[/+=]/g, '');
+    const existingMedia = document.getElementById(`media-${safeId}`);
+
+    if (existingMedia) {
+        existingMedia.remove();
+        btn.innerText = "View Media";
+        return;
+    }
+
+    const mediaRow = document.createElement('tr');
+    mediaRow.id = `media-${safeId}`;
+    
+    // Use semicolon (;) as the separator now
+    const parts = mediaString.split(';');
+    let contentHtml = `<div style="display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; padding: 20px; background: #fffcf8; border: 1px solid var(--saffron);">`;
+
+    parts.forEach(part => {
+        const trimmedPart = part.trim();
+        if (trimmedPart.startsWith('YT:')) {
+            // Extracts everything after YT: without losing underscores/dashes
+            const ytId = trimmedPart.substring(3); 
+            
+            contentHtml += `
+                <div style="flex: 1; min-width: 300px; text-align: center;">
+                    <iframe width="100%" height="250" 
+                        src="https://www.youtube-nocookie.com/embed/${ytId}?rel=0" 
+                        frameborder="0" allowfullscreen 
+                        style="border-radius:8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                    </iframe>
+                    <p style="margin-top: 8px;">
+                        <a href="https://www.youtube.com/watch?v=${ytId}" target="_blank" style="font-size: 0.8rem; color: #ff0000; text-decoration: none; font-weight:bold;">
+                            📺 Open in YouTube App
+                        </a>
+                    </p>
+                </div>`;
+        } 
+        else if (trimmedPart.startsWith('GP:')) {
+            const gpUrl = trimmedPart.substring(3);
+            contentHtml += `
+                <div style="flex: 1; min-width: 250px; display: flex; align-items: center; justify-content: center;">
+                    <a href="${gpUrl}" target="_blank" class="media-link-btn gp-btn">
+                        🖼️ View Google Photos Album
+                    </a>
+                </div>`;
+        }
+        else if (trimmedPart.startsWith('GD:')) {
+            const gdId = trimmedPart.substring(3);
+            contentHtml += `
+                <div style="width: 100%; text-align: center;">
+                    <a href="https://drive.google.com/drive/folders/${gdId}" target="_blank" class="media-link-btn gd-btn">
+                        📁 Open Google Drive Folder
+                    </a>
+                </div>`;
+        }
+    });
+
+    contentHtml += `</div>`;
+    mediaRow.innerHTML = `<td colspan="4">${contentHtml}</td>`;
+    
+    currentRow.parentNode.insertBefore(mediaRow, currentRow.nextSibling);
+    btn.innerText = "Close Media";
+}
+function renderMonthWiseView(rows) {
+    const months = {};
+    rows.forEach(row => {
+        const cols = row.split(',');
+        const d = new Date(cols[0]);
+        if (isNaN(d)) return;
+        
+        const monthName = d.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+        if (!months[monthName]) months[monthName] = [];
+        months[monthName].push({ date: d.getDate(), name: cols[1] });
+    });
+
+    const grid = document.getElementById('calendar-grid');
+    grid.innerHTML = Object.entries(months).map(([month, events]) => `
+        <div style="background: white; border: 1px solid var(--saffron); border-radius: 8px; padding: 15px;">
+            <h4 style="color: var(--maroon); border-bottom: 2px solid var(--saffron); margin-bottom: 10px;">${month}</h4>
+            <ul style="list-style: none; padding: 0;">
+                ${events.map(e => `<li><strong>${e.date}:</strong> ${e.name}</li>`).join('')}
+            </ul>
+        </div>
+    `).join('');
+}
+async function updateSidebar(calendarRows) {
+    const now = new Date();
+    now.setHours(0,0,0,0);
+
+    // 1. UPDATE SPECIAL EVENTS (from events.csv)
+    try {
+        const res = await fetch(config.events);
+        const text = await res.text();
+        const rows = text.split('\n').slice(1);
+        
+        const upcomingSpecials = rows
+            .map(row => row.split(','))
+            .filter(cols => cols.length >= 4 && cols[3].trim().toLowerCase() === 'yearly')
+            .map(cols => ({ date: new Date(cols[0].trim()), name: cols[1].trim() }))
+            .filter(item => !isNaN(item.date) && item.date >= now)
+            .sort((a, b) => a.date - b.date) // Soonest first
+            .slice(0, 2); // Show top 2 specials
+
+        document.getElementById('upcoming-specials-list').innerHTML = upcomingSpecials.map(item => `
+            <li style="margin-bottom: 12px;">
+                <strong style="color:var(--maroon); font-size: 0.85rem;">
+                    ${item.date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}
+                </strong><br>
+                <span style="font-size: 0.9rem;">${item.name}</span>
+            </li>
+        `).join('') || "<li>No upcoming festivals</li>";
+    } catch (e) { console.error("Error loading special events", e); }
+
+    // 2. UPDATE MONTHLY RITUALS (from monthly_calendar.csv)
+    try {
+        const rows = calendarRows;
+        // const res = await fetch(config.monthly_events);
+        // const text = await res.text();
+        // const rows = text.split('\n').slice(1);
+
+        const nextMonthly = rows
+            .map(row => row.split(','))
+            .filter(cols => cols.length === 2)
+            .map(cols => ({ date: new Date(cols[0].trim()), name: cols[1].trim() }))
+            .filter(item => !isNaN(item.date) && item.date >= now)
+            .sort((a, b) => a.date - b.date)
+            .slice(0, 3); // Show top 3 monthly poojas
+
+        document.getElementById('next-monthly-list').innerHTML = nextMonthly.map(item => `
+            <li style="margin-bottom: 8px; font-size: 0.85rem;">
+                <strong style="color:var(--maroon); font-size: 0.75rem;">
+                    ${item.date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })} : &nbsp;
+                </strong>
+                ${item.name}
+            </li>
+        `).join('') || "<li>Dates coming soon</li>";
+    } catch (e) { console.error("Error loading monthly calendar", e); }
+}
+function renderMonthWiseView(rows) {
+    const grid = document.getElementById('calendar-grid');
+    if (!grid) return;
+
+    const monthData = {};
+
+    rows.forEach(row => {
+        const cols = row.split(',');
+        if (cols.length < 2) return;
+        
+        const dateObj = new Date(cols[0].trim());
+        if (isNaN(dateObj)) return;
+
+        // Group by Month (e.g., "January 2026")
+        const monthKey = dateObj.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+        
+        if (!monthData[monthKey]) monthData[monthKey] = [];
+        monthData[monthKey].push({
+            day: dateObj.getDate(),
+            weekday: dateObj.toLocaleDateString('en-GB', { weekday: 'short' }),
+            name: cols[1].trim()
+        });
+    });
+
+    // Generate the HTML for each month card
+    grid.innerHTML = Object.entries(monthData).map(([monthName, dates]) => `
+        <div class="month-card">
+            <h4>${monthName}</h4>
+            <ul>
+                ${dates.map(d => `
+                    <li>
+                        <span style="color:var(--maroon); font-weight:bold; width: 30px; display:inline-block;">
+                            ${d.day}
+                        </span>
+                        <span style="color:#888; font-size:0.75rem; margin-right:10px;">
+                            ${d.weekday}
+                        </span>
+                        ${d.name}
+                    </li>
+                `).join('')}
+            </ul>
+        </div>
+    `).join('');
 }
 window.onload = initApp;
 </script>
