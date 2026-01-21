@@ -226,13 +226,6 @@
                     </ul>
                 </div>
                 </div>
-    
-                <div class="sidebar-box highlights-box">
-                    <h3>✨ Recent Highlights</h3>
-                    <div id="mini-gallery" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-                    </div>
-                    <button onclick="switchTab('activities')" style="width: 100%; margin-top: 10px; background: none; border: 1px solid var(--maroon); color: var(--maroon); font-size: 0.8rem; cursor: pointer;">View All Photos</button>
-                </div>
             </div>
         </div>
     </div>
@@ -323,7 +316,7 @@
                 
                 <div style="background: #fffcf8; border: 1px solid var(--saffron); padding: 20px; border-radius: 8px;">
                     <table style="margin: 0; border: none; font-size: 1rem; width: 100%;">
-                        <tr style="background: transparent;"><td style="border:none; padding: 5px; font-weight: bold; width: 130px;">Account Name:</td><td style="border:none; padding: 5px;">Dharma Paripalana Samithi Estancia</td></tr>
+                        <tr style="background: transparent;"><td style="border:none; padding: 5px; font-weight: bold; width: 130px;">Account Name:</td><td style="border:none; padding: 5px;">Dharma Paripalana Samithi</td></tr>
                         
                         <tr style="background: transparent;">
                             <td style="border:none; padding: 5px; font-weight: bold;">Account No:</td>
@@ -427,7 +420,8 @@
 </footer>
 
 <script>
-    // --- APP STATE ---
+
+// --- APP STATE ---
 const config = {
     events: 'data/events.csv',
     monthly_events: 'data/monthly_events.csv',
@@ -441,23 +435,25 @@ const config = {
 // Also update the logo error handler if you have one
 const logoImg = document.getElementById('main-logo');
 if (logoImg) logoImg.src = config.logoPath;
-    // --- TAB LOGIC ---
-    function switchTab(id) {
-        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-        document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-        event.currentTarget.classList.add('active');
-        window.scrollTo(0,0);
-    }
 
-    // --- DATA LOADING ---
-    async function loadCSV(file) {
-        try {
-            const res = await fetch(file);
-            const text = await res.text();
-            return text.split('\n').map(row => row.split(',')).filter(row => row.length > 1);
-        } catch (e) { console.error("Error loading " + file, e); return []; }
-    }
+// --- TAB LOGIC ---
+function switchTab(id) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    event.currentTarget.classList.add('active');
+    window.scrollTo(0,0);
+}
+
+// --- DATA LOADING ---
+async function loadCSV(file) {
+    try {
+        const res = await fetch(file);
+        const text = await res.text();
+        return text.split('\n').map(row => row.split(',')).filter(row => row.length > 1);
+    } catch (e) { console.error("Error loading " + file, e); return []; }
+}
+
 // --- UPDATED INITIALIZE DATA ---
 async function initApp() {
     // 1. Handle Logo Fallback
@@ -469,77 +465,20 @@ async function initApp() {
     const trustees = await loadCSV(config.trustees);
     const photoData = await loadCSV(config.manifest);
 
-    // --- PASTE THE NEW SIDEBAR LOGIC HERE ---
-
-    // A. Populate "Upcoming Events" Sidebar Box
-    const upcomingContainer = document.getElementById('upcoming-list');
-const monthlySidebar = document.getElementById('monthly-sidebar-list');
-
-if (upcomingContainer && monthlySidebar) {
-    const now = new Date();
-
-    // 1. FILTER SPECIAL EVENTS (Future only)
-    const specials = events.slice(1)
-        .filter(row => {
-            const dateObj = new Date(row[0].trim());
-            return row[3].trim().toLowerCase() !== 'monthly' && !isNaN(dateObj) && dateObj >= now;
-        })
-        .sort((a, b) => new Date(a[0]) - new Date(b[0]))
-        .slice(0, 2); // Show top 2
-
-    // 2. FILTER MONTHLY REGULARS
-    const regulars = events.slice(1)
-        .filter(row => row[3].trim().toLowerCase() === 'monthly')
-        .slice(0, 2); // Show top 2
-
-    // Render Specials with your requested formatting
-    upcomingContainer.innerHTML = specials.map(row => {
-    const d = new Date(row[0].trim());
-    
-    // Updated options for: "Wednesday January 21 2026"
-    const formatted = d.toLocaleDateString('en-GB', { 
-        weekday: 'long', 
-        month: 'long', 
-        day: 'numeric', 
-        year: 'numeric' 
-    }).replace(/,/g, ''); // Removes the comma if the browser adds one
-
-    return `
-        <li style="padding:5px 0; font-size:0.85rem; border-bottom: 1px solid #eee;">
-            <strong style="color:var(--maroon);">${formatted}</strong><br>
-            ${row[1]}
-        </li>`;
-    }).join('') || "<li>Stay tuned for updates!</li>";
-    // Render Regulars
-    monthlySidebar.innerHTML = regulars.map(row => 
-        `<li style="padding:5px 0; font-size:0.85rem;"><strong style="color:#555;">${row[0]}:</strong> ${row[1]}</li>`
-    ).join('');
-}
-    // B. Populate "Mini Gallery" Sidebar Box
-    const miniGallery = document.getElementById('mini-gallery');
-    if (miniGallery) {
-        const recentPhotos = photoData.slice(1, 5); // Take top 4 from manifest.csv
-        miniGallery.innerHTML = recentPhotos.map(p => 
-            `<img src="${config.highlightsDir}${p[0].trim()}" style="width:100%; height:70px; object-fit:cover; border-radius:4px;" onerror="this.src='https://via.placeholder.com/70?text=Image'">`
-        ).join('');
-    }
-
-    // --- END OF NEW SIDEBAR LOGIC ---
-
     // 3. Existing logic for the full Tables (Monthly/Yearly)
     renderEventTables(events); // (Assuming you grouped your table logic here)
     renderSpecialEvents(events);
 
     // 2. Fetch the Monthly Calendar (The file you just created)
-        const calendarRes = await fetch(config.monthly_events);
-        const calendarText = await calendarRes.text();
+    const calendarRes = await fetch(config.monthly_events);
+    const calendarText = await calendarRes.text();
         
-        // Clean the data: remove empty lines and split into rows
-        const calendarRows = calendarText.split('\n').filter(row => row.trim() !== '');
+    // Clean the data: remove empty lines and split into rows
+    const calendarRows = calendarText.split('\n').filter(row => row.trim() !== '');
 
-        // 3. CALL THE FUNCTIONS HERE
-        // This updates the "Next 3" in the sidebar
-        updateSidebar(calendarRows); 
+    // 3. CALL THE FUNCTIONS HERE
+    // This updates the "Next 3" in the sidebar
+    updateSidebar(calendarRows); 
         
         // This generates the 12-month grid in the main body
     renderMonthWiseView(calendarRows);
@@ -552,48 +491,18 @@ if (upcomingContainer && monthlySidebar) {
     startHeroSlideshow(photoData);
     
 }
-async function loadMonthlySidebar() {
-    const response = await fetch('data/monthly_calendar.csv');
-    const data = await response.text();
-    const rows = data.split('\n').slice(1); // Skip header
-    const now = new Date();
-    now.setHours(0,0,0,0); // Reset time for accurate comparison
 
-    const upcoming = rows
-        .map(row => row.split(','))
-        .filter(cols => cols.length === 2)
-        .map(cols => ({ date: new Date(cols[0].trim()), name: cols[1].trim() }))
-        .filter(item => item.date >= now) // Future only
-        .sort((a, b) => a.date - b.date) // Soonest first
-        .slice(0, 3); // Get next 3
-
-    const container = document.getElementById('next-monthly-list');
-    container.innerHTML = upcoming.map(item => `
-        <li style="margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px;">
-            <span style="font-size: 0.75rem; color: #888; display: block;">
-                ${item.date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
-            </span>
-            <strong>${item.name}</strong>
-        </li>
-    `).join('') || "<li>Dates to be announced</li>";
+async function renderEventTables(events) {
+    const yearlyTable = document.getElementById('yearly-list');
+    events.slice(1).forEach(row => {
+        if (row.length < 4) return; // Skip incomplete rows    
+        const [date, detail, venue, type] = row;
+        const htmlRow = `<tr><td>${date}</td><td>${detail}</td><td>${venue}</td></tr>`;
+        yearlyTable.innerHTML += htmlRow;
+    });
 }
-    async function renderEventTables(events) {
-        const monthlyTable = document.getElementById('monthly-list');
-        const yearlyTable = document.getElementById('yearly-list');
-        events.slice(1).forEach(row => {
-            if (row.length < 4) return; // Skip incomplete rows
-            
-            const [date, detail, venue, type] = row;
-            const htmlRow = `<tr><td>${date}</td><td>${detail}</td><td>${venue}</td></tr>`;
-            
-            if (type.trim().toLowerCase() === 'monthly') {
-                monthlyTable.innerHTML += htmlRow;
-            } else {
-                yearlyTable.innerHTML += htmlRow;
-            }
-        });
-    }
- async function renderSpecialEvents(events) {
+
+async function renderSpecialEvents(events) {
     const tableBody = document.getElementById('yearly-list');
     if (!tableBody) return;
 
@@ -621,48 +530,51 @@ async function loadMonthlySidebar() {
                 <td>${row[1]}</td>
                 <td>${row[2]}</td>
                 <td>
-                    ${row[4] ? `<button onclick="toggleMedia('${row[4].trim()}')" class="media-btn">View Media</button>` : '<span style="color:#ccc;">-</span>'}
+                    <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+                        ${row[4] ? `<button onclick="toggleMedia('${row[4].trim()}')" class="media-btn" style="background: var(--maroon); color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.8rem;">View Media</button>` : ''}
+                        ${d > new Date() ? `<button onclick="switchTab('donate')" class="donate-btn" style="background: var(--saffron); color: var(--maroon); border: 1px solid var(--maroon); padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: bold;">
+                            Donate
+                        </button>`:''}
+                    </div>
                 </td>
             </tr>`;
     }).join('');
 }
-    async function renderTrustees(trustees) {
-        // 3. Load Trustees
-       // const trustees = await loadCSV(config.trustees);
-        const mgmtList = document.getElementById('mgmt-list');
-        const trustList = document.getElementById('trustee-list');
-        const advisorList = document.getElementById('advisor-list');
-        trustees.slice(1).forEach(row => {
-            if(row[2].trim().toLowerCase() === 'management') {
-                mgmtList.innerHTML += `<div class="name-card"><strong>${row[0]}</strong><br><small style="color:#666">${row[1]}</small></div>`;
-            } else if (row[2].trim().toLowerCase() === 'advisor') {
-                advisorList.innerHTML += `<div class="name-card"><strong>${row[0]}</strong><br><small style="color:#666">${row[1]}</small></div>`;
-            } else {
-                trustList.innerHTML += `<div class="name-card"><strong>${row[0]}</strong></div>`;
-            }
-        });
-    }
-
-        // 4. Load Slideshow from Manifest
-    async function startHeroSlideshow(photoData) {
-        //const photoData = await loadCSV(config.manifest);
-        const photos = photoData.slice(1);
-        if(photos.length > 0) {
-            let idx = 0;
-            const box = document.getElementById('slideshow-box');
-            const cap = document.getElementById('slide-caption');
-            
-            const nextSlide = () => {
-                const [file, caption] = photos[idx];
-                box.style.backgroundImage = `url(${config.highlightsDir}${file.trim()})`;
-                cap.innerText = caption ? caption.trim() : "Dharma Paripalana Samithi";
-                idx = (idx + 1) % photos.length;
-            };
-            nextSlide();
-            setInterval(nextSlide, 5000);
+async function renderTrustees(trustees) {
+    const mgmtList = document.getElementById('mgmt-list');
+    const trustList = document.getElementById('trustee-list');
+    const advisorList = document.getElementById('advisor-list');
+    trustees.slice(1).forEach(row => {
+        if(row[2].trim().toLowerCase() === 'management') {
+            mgmtList.innerHTML += `<div class="name-card"><strong>${row[0]}</strong><br><small style="color:#666">${row[1]}</small></div>`;
+        } else if (row[2].trim().toLowerCase() === 'advisor') {
+            advisorList.innerHTML += `<div class="name-card"><strong>${row[0]}</strong><br><small style="color:#666">${row[1]}</small></div>`;
+        } else {
+            trustList.innerHTML += `<div class="name-card"><strong>${row[0]}</strong></div>`;
         }
+    });
+}
+
+// 4. Load Slideshow from Manifest
+async function startHeroSlideshow(photoData) {
+    const photos = photoData.slice(1);
+    if(photos.length > 0) {
+        let idx = 0;
+        const box = document.getElementById('slideshow-box');
+        const cap = document.getElementById('slide-caption');
+            
+        const nextSlide = () => {
+            const [file, caption] = photos[idx];
+            box.style.backgroundImage = `url(${config.highlightsDir}${file.trim()})`;
+            cap.innerText = caption ? caption.trim() : "Dharma Paripalana Samithi";
+            idx = (idx + 1) % photos.length;
+        };
+        nextSlide();
+         setInterval(nextSlide, 5000);
     }
-    function copyText(elementId) {
+}
+
+function copyText(elementId) {
     const text = document.getElementById(elementId).innerText;
     navigator.clipboard.writeText(text).then(() => {
         const status = document.getElementById('copyStatus');
@@ -670,6 +582,7 @@ async function loadMonthlySidebar() {
         setTimeout(() => { status.innerText = ""; }, 2000);
     });
 }
+
 function toggleFlatField() {
     const isResident = document.getElementById('residentCheck').value;
     const flatField = document.getElementById('flatField');
@@ -779,53 +692,11 @@ async function handleSubmit(event) {
     }
 }
 
-async function handleSubmit1(event) {
-    // CRITICAL: This stops the page from refreshing/going blank
-    event.preventDefault(); 
-    
-    console.log("Submission started..."); // Check your console for this
-
-    const data = new FormData(event.target);
-    
-    // Start Loading UI
-    submitButton.classList.add("loading");
-    buttonText.innerText = "SENDING...";
-
-    fetch(event.target.action, {
-        method: contactForm.method,
-        body: data,
-        headers: { 'Accept': 'application/json' }
-    }).then(response => {
-/*        console.log("Response received:", response.status);
-        if (response.ok) {
-            // SUCCESS: Hide the form and show the message
-            contactForm.style.setProperty("display", "none", "important");
-            successMessage.style.setProperty("display", "block", "important");
-            console.log("Success message should now be visible.");*/
-            console.log("Response received:", response.status);
-        if (response.ok) {
-            // SUCCESS: Force the swap
-            contactForm.classList.add("hidden-element");
-            successMessage.classList.remove("hidden-element");
-            successMessage.classList.add("visible-element");
-            
-            console.log("Success message classes updated.");
-        } else {
-            alert("There was an error with the server. Please try again.");
-        }
-    }).catch(error => {
-        console.error("Fetch error:", error);
-        alert("Network error. Please check your connection.");
-    }).finally(() => {
-        submitButton.classList.remove("loading");
-        buttonText.innerText = "SEND MESSAGE";
-    });
-}
-
 // Attach the listener
 if (contactForm) {
     contactForm.addEventListener("submit", handleSubmit);
 }
+
 function resetForm() {
     // 1. Clear all text and selections in the form
     contactForm.reset();
@@ -849,6 +720,7 @@ function resetForm() {
     document.getElementById("charCounter").innerText = "0 / 1000 characters";
     document.getElementById("charCounter").style.color = "#666";
 }
+
 function updateCount() {
     const messageBox = document.getElementById("messageBox");
     const counter = document.getElementById("charCounter");
@@ -867,6 +739,7 @@ function updateCount() {
         counter.style.fontWeight = "normal";
     }
 }
+
 async function toggleMedia(mediaString) {
     const btn = event.target;
     const currentRow = btn.closest('tr');
@@ -935,23 +808,49 @@ async function toggleMedia(mediaString) {
     btn.innerText = "Close Media";
 }
 function renderMonthWiseView(rows) {
-    const months = {};
+    const grid = document.getElementById('calendar-grid');
+    if (!grid) return;
+
+    const monthData = {};
+
     rows.forEach(row => {
         const cols = row.split(',');
-        const d = new Date(cols[0]);
-        if (isNaN(d)) return;
+        if (cols.length < 2) return;
         
-        const monthName = d.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
-        if (!months[monthName]) months[monthName] = [];
-        months[monthName].push({ date: d.getDate(), name: cols[1] });
+        const dateObj = new Date(cols[0].trim());
+        if (isNaN(dateObj)) return;
+
+        const monthKey = dateObj.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+        
+        if (!monthData[monthKey]) monthData[monthKey] = [];
+        monthData[monthKey].push({
+            day: dateObj.getDate(),
+            weekday: dateObj.toLocaleDateString('en-GB', { weekday: 'short' }),
+            name: cols[1].trim()
+        });
     });
 
-    const grid = document.getElementById('calendar-grid');
-    grid.innerHTML = Object.entries(months).map(([month, events]) => `
-        <div style="background: white; border: 1px solid var(--saffron); border-radius: 8px; padding: 15px;">
-            <h4 style="color: var(--maroon); border-bottom: 2px solid var(--saffron); margin-bottom: 10px;">${month}</h4>
-            <ul style="list-style: none; padding: 0;">
-                ${events.map(e => `<li><strong>${e.date}:</strong> ${e.name}</li>`).join('')}
+    grid.innerHTML = Object.entries(monthData).map(([monthName, dates]) => `
+        <div class="month-card">
+            <h4>${monthName}</h4>
+            <ul>
+                ${dates.map(d => {
+                    // Logic to select the icon based on the event name
+                    let icon = "";
+                    if (d.name.toLowerCase().includes("sankatahara")) {
+                        icon = '<img src="images/sankataharachathurthi.png" style="width:18px; vertical-align:middle;">'; // Or use an <img> tag for a custom Ganesha icon
+                    } else if (d.name.toLowerCase().includes("pradosham")) {
+                        icon = '<img src="images/pradosham.png" style="width:18px; vertical-align:middle;">'; // Or a Lingam icon/emoji
+                    }
+
+                    return `
+                    <li style="display: flex; align-items: center; gap: 8px;">
+                        <span style="color:var(--maroon); font-weight:bold; width: 25px;">${d.day}</span>
+                        <span style="color:#888; font-size:0.75rem; width: 35px;">${d.weekday}</span>
+                        <span style="font-size: 1.1rem; width: 20px; text-align: center;">${icon}</span>
+                        <span>${d.name}</span>
+                    </li>`;
+                }).join('')}
             </ul>
         </div>
     `).join('');
@@ -980,6 +879,9 @@ async function updateSidebar(calendarRows) {
                     ${item.date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}
                 </strong><br>
                 <span style="font-size: 0.9rem;">${item.name}</span>
+                <button onclick="switchTab('donate')" class="donate-btn" style="background: var(--saffron); color: var(--maroon); border: 1px solid var(--maroon); padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: bold;">
+                    Donate
+                </button>
             </li>
         `).join('') || "<li>No upcoming festivals</li>";
     } catch (e) { console.error("Error loading special events", e); }
@@ -987,10 +889,6 @@ async function updateSidebar(calendarRows) {
     // 2. UPDATE MONTHLY RITUALS (from monthly_calendar.csv)
     try {
         const rows = calendarRows;
-        // const res = await fetch(config.monthly_events);
-        // const text = await res.text();
-        // const rows = text.split('\n').slice(1);
-
         const nextMonthly = rows
             .map(row => row.split(','))
             .filter(cols => cols.length === 2)
@@ -1004,55 +902,13 @@ async function updateSidebar(calendarRows) {
                 <strong style="color:var(--maroon); font-size: 0.75rem;">
                     ${item.date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })} : &nbsp;
                 </strong>
-                ${item.name}
+            ${(item.name.toLowerCase().includes("sankatahara")) ? `<img src="images/sankataharachathurthi.png" style="width:18px; vertical-align:middle;">`
+            : `<img src="images/pradosham.png" style="width:18px; vertical-align:middle;">`}${item.name}
             </li>
         `).join('') || "<li>Dates coming soon</li>";
     } catch (e) { console.error("Error loading monthly calendar", e); }
 }
-function renderMonthWiseView(rows) {
-    const grid = document.getElementById('calendar-grid');
-    if (!grid) return;
 
-    const monthData = {};
-
-    rows.forEach(row => {
-        const cols = row.split(',');
-        if (cols.length < 2) return;
-        
-        const dateObj = new Date(cols[0].trim());
-        if (isNaN(dateObj)) return;
-
-        // Group by Month (e.g., "January 2026")
-        const monthKey = dateObj.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
-        
-        if (!monthData[monthKey]) monthData[monthKey] = [];
-        monthData[monthKey].push({
-            day: dateObj.getDate(),
-            weekday: dateObj.toLocaleDateString('en-GB', { weekday: 'short' }),
-            name: cols[1].trim()
-        });
-    });
-
-    // Generate the HTML for each month card
-    grid.innerHTML = Object.entries(monthData).map(([monthName, dates]) => `
-        <div class="month-card">
-            <h4>${monthName}</h4>
-            <ul>
-                ${dates.map(d => `
-                    <li>
-                        <span style="color:var(--maroon); font-weight:bold; width: 30px; display:inline-block;">
-                            ${d.day}
-                        </span>
-                        <span style="color:#888; font-size:0.75rem; margin-right:10px;">
-                            ${d.weekday}
-                        </span>
-                        ${d.name}
-                    </li>
-                `).join('')}
-            </ul>
-        </div>
-    `).join('');
-}
 window.onload = initApp;
 </script>
 
