@@ -5,7 +5,7 @@ Welcome to the official web portal for **Dharma Paripalana Samithi (DPS) Estanci
 ## 🚀 Live Site
 
 The site is hosted on **GitHub Pages** with enforced **HTTPS** for secure data transmission.
-**URL:** `https://dpsestancia.github.io/dps-web/`
+**URL:** `https://dpsestancia.github.io/website/`
 
 ---
 
