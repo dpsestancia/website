@@ -3,341 +3,764 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="images/favicon.png">
+    <link rel="apple-touch-icon" href="images/favicon.png">
     <title>Dharma Paripalana Samithi Estancia</title>
     <style>
-        :root {
-            --saffron: #FF9933;
-            --deep-saffron: #FF6600;
-            --maroon: #800000;
-            --gold: #D4AF37;
-            --cream: #fffaf0;
+        html {scroll-behavior: smooth;}
+        :root { --saffron: #FF9933; --maroon: #800000; --gold: #D4AF37; }
+        body { font-family: 'Garamond', serif; margin: 0; background: #fffaf0; color: #333; line-height: 1.6; }
+        
+        header { background: var(--maroon); color: white; text-align: center; padding: 25px; border-bottom: 5px solid var(--saffron); }
+        header h1 { margin: 0; font-size: 19px; text-transform: uppercase; letter-spacing: 1px; }
+        
+        nav { background: var(--saffron); display: flex; justify-content: center; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        nav button { background: none; border: none; padding: 15px 25px; font-size: 1rem; cursor: pointer; color: var(--maroon); font-weight: bold; transition: 0.3s; }
+        nav button:hover { background: rgba(128, 0, 0, 0.1); }
+        nav button.active { background: var(--maroon); color: white; }
+
+        #slideshow-box { 
+            width: 100%; height: 500px; background-size: cover; background-position: center;
+            transition: background-image 1.2s ease-in-out; display: flex; align-items: flex-end;
+            background-color: #444;
         }
+        .hero-overlay { background: rgba(0,0,0,0.6); color: white; padding: 25px; width: 100%; text-align: center; }
+        .hero-overlay h2 { margin: 0; font-size: 1.8rem; color: var(--saffron); }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            background-color: var(--cream);
-            color: #333;
-            line-height: 1.6;
-        }
+        .container { max-width: 1100px; margin: 30px auto; padding: 30px; background: white; border-radius: 10px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); box-sizing: border-box;}
+        .tab-content { display: none; min-height: 400px; }
+        .tab-content.active { display: block; animation: fadeIn 0.6s ease; }
 
-        /* Header */
-        header {
-            background: white;
-            padding: 20px 5%;
-            display: flex;
-            align-items: center;
-            border-bottom: 4px solid var(--saffron);
-        }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; border: 1px solid #eee; }
+        th { background: var(--maroon); color: white; padding: 15px; text-align: left; }
+        td { padding: 12px; border-bottom: 1px solid #eee; }
+        tr:nth-child(even) { background: #fffcf8; }
 
-        .logo { height: 90px; margin-right: 20px; }
-        .trust-title h1 { margin: 0; color: var(--maroon); font-size: 1.7rem; }
-        .trust-title p { margin: 5px 0 0; color: var(--deep-saffron); font-weight: bold; }
+        .trustee-grid { display: flex; flex-wrap: wrap; gap: 40px; margin-top: 20px; }
+        .column { flex: 1; min-width: 300px; }
+        .column h3 { color: var(--maroon); border-bottom: 2px solid var(--saffron); padding-bottom: 10px; }
+        .name-card { margin-bottom: 15px; padding: 5px 0; }
 
-        /* Navigation */
-        nav {
-            background: var(--maroon);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            text-align: center;
-            display: flex;
-            justify-content: center;
-        }
+        footer { background: #222; color: #bbb; text-align: center; padding: 40px 20px; font-size: 0.9rem; }
+        footer strong { color: white; }
 
-        nav button {
-            background: none;
-            border: none;
-            color: white;
-            padding: 15px 25px;
-            font-weight: bold;
-            text-transform: uppercase;
-            cursor: pointer;
-            font-size: 14px;
-            transition: 0.3s;
-        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @media (max-width: 768px) { #slideshow-box { height: 300px; } nav { flex-wrap: wrap; } }
+        /* Loading Spinner Styles */
+.spinner {
+    display: none;
+    width: 18px;
+    height: 18px;
+    border: 3px solid rgba(255,255,255,.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 1s ease-in-out infinite;
+    margin-right: 10px;
+}
 
-        nav button:hover, nav button.active {
-            background: var(--deep-saffron);
-        }
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
 
-        /* Content Sections */
-        .content-section {
-            display: none;
-            padding: 40px 5%;
-            animation: fadeIn 0.5s ease;
-        }
+/* Button state when sending */
+#submitBtn.loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: not-allowed;
+    opacity: 0.8;
+}
 
-        .content-section.active { display: block; }
+#submitBtn.loading .spinner {
+    display: inline-block;
+}
+.hidden-element {
+    display: none !important;
+}
 
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
+.visible-element {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+/* Homepage Grid Layout */
+.home-grid {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 40px;
+}
 
-        h2.section-title {
-            text-align: center;
-            color: var(--maroon);
-            border-bottom: 2px solid var(--gold);
-            padding-bottom: 10px;
-            margin: 40px 0 20px 0;
-        }
+.sidebar-box {
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
 
-        /* Home Style */
-        .intro-box {
-            background: white;
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-            max-width: 900px;
-            margin: 0 auto;
-            border-left: 8px solid var(--saffron);
-        }
+.sidebar-box h3 {
+    margin-top: 0;
+    font-size: 1.1rem;
+    color: var(--maroon);
+    border-bottom: 2px solid var(--saffron);
+    padding-bottom: 8px;
+}
 
-        /* Slideshow */
-        .slideshow-container {
-            max-width: 100%;
-            position: relative;
-            margin: 30px auto;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            border: 4px solid white;
-        }
-        .mySlides { display: none; }
-        .fade { animation: fadeAnim 1.5s; }
-        @keyframes fadeAnim { from {opacity: .4} to {opacity: 1} }
-        .slide-text {
-            position: absolute;
-            bottom: 0;
-            width: 100%;
-            text-align: center;
-            background: rgba(128, 0, 0, 0.7);
-            color: white;
-            padding: 10px 0;
-            font-weight: bold;
-        }
-
-        /* Tables */
-        .table-container { overflow-x: auto; background: white; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 30px; }
-        table { width: 100%; border-collapse: collapse; min-width: 800px; }
-        th { background: var(--saffron); color: white; padding: 15px; text-align: left; }
-        td { padding: 15px; border-bottom: 1px solid #eee; font-size: 0.95rem; }
-        tr:nth-child(even) { background-color: #fef9f3; }
-        .highlight-text { color: var(--deep-saffron); font-weight: bold; }
-        .donation-highlight { color: #27ae60; font-weight: bold; }
-
-        /* Leadership Grid */
-        .leadership-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
-        .card { background: white; padding: 25px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border-top: 5px solid var(--maroon); }
-        .name-item { padding: 5px 0; border-bottom: 1px inset #fafafa; display: flex; justify-content: space-between; }
-        .role { color: var(--deep-saffron); font-weight: bold; font-size: 0.85rem; }
-
-        /* Donate Grid */
-        .donation-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 20px; }
-        .bank-details { background: white; padding: 30px; border-radius: 10px; border: 1px solid #ddd; }
-        .qr-card { background: white; padding: 20px; border-radius: 10px; text-align: center; border: 1px solid #ddd; }
-        .qr-card img { width: 100%; max-width: 250px; margin-top: 10px; }
-
-        .btn-link {
-            background: var(--maroon);
-            color: white;
-            padding: 12px 25px;
-            text-decoration: none;
-            border-radius: 5px;
-            font-weight: bold;
-            display: inline-block;
-            margin-top: 20px;
-        }
-
-        footer { background: #222; color: white; text-align: center; padding: 40px 5%; margin-top: 50px; }
-        footer a { color: var(--saffron); text-decoration: none; }
-
-        @media (max-width: 768px) { .leadership-grid, .donation-grid { grid-template-columns: 1fr; } }
+/* Responsive: Stack on mobile */
+@media (max-width: 850px) {
+    .home-grid {
+        grid-template-columns: 1fr;
+    }
+}
     </style>
 </head>
 <body>
-
 <header>
-    <img src="logo.png" alt="Trust Logo" class="logo" onerror="this.src='https://via.placeholder.com/90?text=DPS+Logo'">
-    <div class="trust-title">
-        <h1>Dharma Paripalana Samithi Estancia</h1>
-        <h2>(A Registered Charitable Trust - Regn# 187/2021)</h2>
+    <div class="header-container" style="display: flex; align-items: center; justify-content: center; max-width: 1200px; margin: 0 auto;">
+        <img src="images/logo.png" alt="DPS Logo" id="main-logo" style="height: 80px; width: auto; margin-right: 20px;" onerror="this.style.display='none'">
+        <div class="header-text">
+            <h1 style="margin: 0; font-size: 19px; text-transform: uppercase; letter-spacing: 1px;">Dharma Paripalana Samithi Estancia</h1>
+            <p style="margin: 5px 0 0; color: var(--saffron); font-weight: bold;">(A Registered Charitable Trust - Regn# 187/2021)</p>
+        </div>
     </div>
 </header>
 
-<nav id="mainNav">
-    <button class="active" onclick="openTab(event, 'home')">Home</button>
-    <button onclick="openTab(event, 'activities')">Activities Record</button>
-    <button onclick="openTab(event, 'about')">About Us</button>
-    <button onclick="openTab(event, 'donate')">Donate</button>
+<nav id="navbar">
+    <button onclick="switchTab('home')" class="active">HOME</button>
+    <button onclick="switchTab('activities')">ACTIVITIES RECORD</button>
+    <button onclick="switchTab('about')">TRUSTEES</button>
+    <button onclick="switchTab('donate')">DONATIONS</button>
+    <button onclick="switchTab('contact')">CONTACT US</button>
 </nav>
-
-<div id="home" class="content-section active">
-    <div class="intro-box">
-        <h2 style="color:var(--maroon); margin-top: 0;">Welcome</h2>
-        <p>Dharma Paripalana Samithi Estancia is a <strong>religious and charitable institution founded in 2021</strong>. It is managed by trustees comprising of <strong>Estancia complex flat owners</strong> with varied experience dedicated to promoting and spreading the values of <strong>Sanathana Dharma</strong>.</p>
-        
-        <div class="slideshow-container">
-            <div class="mySlides fade">
-                <img src="highlight1.jpg" style="width:100%" onerror="this.src='https://via.placeholder.com/800x400?text=Devotional+Highlights'">
-                <div class="slide-text">Spiritual Discourses & Bhajans</div>
-            </div>
-            <div class="mySlides fade">
-                <img src="highlight2.jpg" style="width:100%" onerror="this.src='https://via.placeholder.com/800x400?text=Annadanam+Events'">
-                <div class="slide-text">Selfless Service: Annadhanam</div>
-            </div>
-            <div class="mySlides fade">
-                <img src="highlight3.jpg" style="width:100%" onerror="this.src='https://via.placeholder.com/800x400?text=Trust+Charity'">
-                <div class="slide-text">Supporting Sanathana Dharma</div>
-            </div>
-            <div class="mySlides fade">
-                <img src="highlight4.jpg" style="width:100%" onerror="this.src='https://via.placeholder.com/800x400?text=Devotional+Highlights'">
-                <div class="slide-text">Spiritual Discourses & Bhajans</div>
-            </div>
-            <div class="mySlides fade">
-                <img src="highlight5.jpg" style="width:100%" onerror="this.src='https://via.placeholder.com/800x400?text=Annadanam+Events'">
-                <div class="slide-text">Selfless Service: Annadhanam</div>
-            </div>
-            <div class="mySlides fade">
-                <img src="highlight6.jpg" style="width:100%" onerror="this.src='https://via.placeholder.com/800x400?text=Trust+Charity'">
-                <div class="slide-text">Supporting Sanathana Dharma</div>
-            </div>
+<div id="home" class="tab-content active">
+    <div id="slideshow-box">
+        <div class="hero-overlay">
+            <h2 id="slide-caption">Promoting Sanatana Dharma</h2>
         </div>
+    </div>
 
-        <p>Our mission is fulfilled by organising bhajans, poojas, discourses, dharmic activities, cultural events and <strong>Annadhanam</strong> to all participants.</p>
-        
-        <div style="text-align: center; border-top: 1px solid #eee; padding-top: 20px;">
-            <h4 style="margin: 0; color: var(--maroon);">Visual Highlights</h4>
-            <a href="https://photos.google.com/share/AF1QipP1hNRUNs-ddF6Q4jpKRxLnoTu6nbh79JAce5oShjGWyoHQYUYLYEn3VGyDW3E7Qg/memory/AF1QipMBcsBuhCRDDSZ0n83ADq9jpkxepRnyhGsBgjWh75-4_6RQPQGLwb_YiPwMRtRGYA?key=TkFGV29jR2NnZ2IxMHFIbGdhTjJqQjBQWVMyUHlB" target="_blank" class="btn-link">View Full Activities Album</a>
+    <div class="container">
+        <div class="home-grid">
+            <div class="about-section">
+                <h2 style="color:var(--maroon); border-bottom: 2px solid var(--saffron); padding-bottom: 10px;">Our Mission</h2>
+                <p style="font-size: 1.1rem; line-height: 1.8; text-align: justify;">
+                    Dharma Paripalana Samithi Estancia is a <strong>religious and charitable institution founded in 2021</strong>. 
+                    It is managed by trustees comprising of <strong>Estancia complex flat owners</strong> with varied experience 
+                    dedicated to promoting and spreading the values of <strong>Sanathana Dharma</strong>.
+                </p>
+                <p>The Samithi serves as a spiritual anchor for the Estancia community, organizing regular Bhajans, Poojas, and philanthropic activities like Annadhanam.</p>
+                <div style="margin-top: 25px;">
+                    <button onclick="switchTab('activities')" style="background: var(--maroon); color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">View Activity Calendar</button>
+                </div>
+            </div>
+
+            <div class="info-sidebar">
+                <div class="sidebar-box upcoming-box">
+    <h3>📅 Events & Activities</h3>
+    
+    <div style="margin-bottom: 15px;">
+        <span style="font-size: 0.8rem; color: #888; text-transform: uppercase; font-weight: bold;">Upcoming Specials</span>
+        <ul id="upcoming-list" style="list-style: none; padding: 0; margin: 0;">
+            </ul>
+    </div>
+
+    <div style="border-top: 1px dashed var(--saffron); padding-top: 10px;">
+        <span style="font-size: 0.8rem; color: #888; text-transform: uppercase; font-weight: bold;">Monthly Regulars</span>
+        <ul id="monthly-sidebar-list" style="list-style: none; padding: 0; margin: 0;">
+            </ul>
+    </div>
+
+    <div style="margin-top: 20px; text-align: center;">
+        <a href="https://youtube.com/channel/UCQKjmSJNNT15ScwyXr3_AhA" target="_blank" 
+           style="display: flex; align-items: center; justify-content: center; background: #FF0000; color: white; padding: 10px; text-decoration: none; border-radius: 5px; font-weight: bold; font-size: 0.85rem;">
+           <img src="https://upload.wikimedia.org/wikipedia/commons/0/09/YouTube_full-color_icon_%282017%29.svg" style="width:20px; margin-right:8px;">
+           Watch on YouTube
+        </a>
+    </div>
+</div>
+                <div class="sidebar-box highlights-box">
+                    <h3>✨ Recent Highlights</h3>
+                    <div id="mini-gallery" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                        </div>
+                    <button onclick="switchTab('activities')" style="width: 100%; margin-top: 10px; background: none; border: 1px solid var(--maroon); color: var(--maroon); font-size: 0.8rem; cursor: pointer;">View All Photos</button>
+                </div>
+            </div>
         </div>
     </div>
 </div>
-
-<div id="activities" class="content-section">
-    <h2 class="section-title">Periodic / Monthly Activities</h2>
-    <div class="table-container">
+<div id="home1" class="tab-content active">
+    <div id="slideshow-box">
+        <div class="hero-overlay">
+            <h2 id="slide-caption">Promoting Sanatana Dharma</h2>
+        </div>
+    </div>
+    <div class="container" style="text-align:center;">
+        <h2 style="color:var(--maroon);">Welcome to the Samithi</h2>
+        <p>Managed by Estancia residents to foster spiritual values through Bhajans, Poojas, and Annadhanam.</p>
+        <a href="https://photos.app.goo.gl/YourActualLinkHere" target="_blank" style="display:inline-block; margin-top:15px; background:var(--maroon); color:white; padding:12px 25px; text-decoration:none; border-radius:5px; font-weight:bold;">VIEW ALL PHOTO HIGHLIGHTS</a>
+    </div>
+</div>
+<div id="activities" class="tab-content">
+    <div class="container">
+        <div style="text-align: right; margin-bottom: 20px;">
+            <a href="#sankalpam-section" style="background: var(--saffron); color: var(--maroon); padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; font-size: 0.9rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                📝 REGISTER FOR SANKALPAM
+            </a>
+        </div>
+        <h2 style="color:var(--maroon); border-left: 5px solid var(--saffron); padding-left: 15px;">Monthly / Periodic Activities</h2>
+        <p style="font-style: italic; color: #666; margin-bottom: 10px;">Ongoing spiritual and charitable activities conducted every month.</p>
         <table>
-            <thead><tr><th>Frequency</th><th>Activity Details</th><th>Venue</th></tr></thead>
-            <tbody>
-                <tr><td>Since Aug 2023</td><td>Monthly donation of <span class="donation-highlight">Rs. 3,000/-</span> to Sri Chaturveda Vidhya Ganapathi Veda Shastra Maha Vidyasthan.</td><td>Athur Chengalpattu</td></tr>
-                <tr><td>Since Aug 2022</td><td>Monthly Pradosham and Sankatahara Chathurthi poojas with Vedic chanting and annadhanam.</td><td>Vidya Mandir Ganapathi temple @ Estancia</td></tr>
-            </tbody>
+            <thead>
+                <tr><th>Schedule</th><th>Activity Detail</th><th>Venue</th></tr>
+            </thead>
+            <tbody id="monthly-list"></tbody>
+        </table>
+
+        <h2 style="color:var(--maroon); border-left: 5px solid var(--saffron); padding-left: 15px; margin-top: 50px;">Special Events & Yearly Calendar</h2>
+        <table>
+            <thead>
+                <tr><th>Date/Occasion</th><th>Activity Detail</th><th>Venue</th></tr>
+            </thead>
+            <tbody id="yearly-list"></tbody>
+        </table>
+
+        <div id="sankalpam-section" style="margin-top: 40px; padding: 25px; background: #fffcf8; border: 2px solid var(--saffron); border-radius: 10px; scroll-margin-top: 80px;">
+    <h3 style="color: var(--maroon); margin-top: 0; border-bottom: 1px solid var(--saffron); padding-bottom: 10px;">
+        Family Sankalpam Registration
+    </h3>
+    <p>New members are requested to provide their family details (Gothram, Nakshatram, etc.) for our permanent records.</p>
+    
+    <div class="jotform-container" style="width: 100%; min-height: 550px;">
+
+    <iframe
+      id="JotFormIFrame-222271804667054"
+      title="Sankalpam"
+      onload="window.parent.scrollTo(0,0)"
+      allowtransparency="true"
+      allow="geolocation; microphone; camera; fullscreen; payment"
+      src="https://form.jotform.com/222271804667054"
+      frameborder="0"
+      style="min-width:100%;max-width:100%;height:539px;border:none;"
+      scrolling="no"
+    >
+    </iframe>
+    <script src='https://cdn.jotfor.ms/s/umd/latest/for-form-embed-handler.js'></script>
+    <script>window.jotformEmbedHandler("iframe[id='JotFormIFrame-222271804667054']", "https://form.jotform.com/")</script>
+    </div>
+    
+    <div style="text-align: right; margin-top: 10px;">
+        <a href="#navbar" style="font-size: 0.8rem; color: var(--maroon); text-decoration: none;">↑ Back to Top</a>
+    </div>
+</div>
+        
+</div>
+    </div>
+</div>
+<div id="activities1" class="tab-content">
+    <div class="container">
+        <h2 style="color:var(--maroon); border-left: 5px solid var(--saffron); padding-left: 15px;">Trust Activity Log</h2>
+        <table>
+            <thead>
+                <tr><th>Date</th><th>Activity Detail</th><th>Venue</th></tr>
+            </thead>
+            <tbody id="event-list"></tbody>
         </table>
     </div>
-
-    <h2 class="section-title">Event History (Recent First)</h2>
-    <div class="table-container">
-        <table>
-            <thead><tr><th>Date</th><th>Activity Details</th><th>Venue</th></tr></thead>
-            <tbody>
-                <tr><td>25 Dec 2025</td><td>Sri Dharmasastha Preeti Utsavam; <span class="highlight-text">Chakkamkulangara Bhajana Samithi troupe</span>. Annadhanam (350).</td><td>Estancia Club house hall</td></tr>
-                <tr><td>12 Oct 2025</td><td>Donation of <span class="donation-highlight">Rs. 16,001/-</span> to SCVG Trust.</td><td>Athur Chengalpattu</td></tr>
-                <tr><td>27 Aug 2025</td><td>Vinayaka Chathurthi utsavam & annadhanam (100).</td><td>Vidya Mandir Temple @ Estancia</td></tr>
-                <tr><td>19 Apr 2025</td><td>Sri Ramanavami; Nama sankeertanam by <span class="highlight-text">Shri Srinathdass Maharaj</span>.</td><td>Estancia Club house hall</td></tr>
-                <tr><td>26 Feb 2025</td><td>Maha Shivarathiri; Ekadasa Rudram chanting by <span class="highlight-text">Shri Bharath Bhatt and team</span>.</td><td>Estancia Club house hall</td></tr>
-                <tr><td>12 Jan 2025</td><td>Veedhi bhajan by <span class="highlight-text">Smt. Suchitra Balasubramanian</span>.</td><td>Vidya Mandir & Estancia Road</td></tr>
-                <tr><td>25 Dec 2024</td><td>Sri Dharmasastha Preeti Utsavam; <span class="highlight-text">Sri. Veeramani Raju</span>.</td><td>Estancia Club house hall</td></tr>
-                <tr><td>23 Oct 2024</td><td>Donation of <span class="donation-highlight">Rs. 42,001/-</span> to SCVG Trust.</td><td>Athur Chengalpattu</td></tr>
-                <tr><td>07 Sep 2024</td><td>Vinayaka Chathurthi utsavam & annadhanam.</td><td>Vidya Mandir Temple @ Estancia</td></tr>
-                <tr><td>08 Mar 2024</td><td>Maha Shivarathiri; Ekadasa Rudram chanting by SMART team.</td><td>Estancia Clubhouse hall</td></tr>
-                <tr><td>25 Dec 2023</td><td>Sri Dharmasastha Preeti Utsavam; <span class="highlight-text">Sri. Veeramani Raju</span>.</td><td>Estancia Club house hall</td></tr>
-                <tr><td>01 Oct 2023</td><td>Gokulashtami; Discourse by <span class="highlight-text">Sri Dushyanth Sridhar</span>.</td><td>Estancia Club House Hall</td></tr>
-                <tr><td>16 July 2023</td><td>Rudhrabhishekam at 1300-year-old Siva Temple.</td><td>Kinar village</td></tr>
-                <tr><td>31 Mar 2023</td><td>Sriramanavami; Donation of <span class="donation-highlight">Rs.5,000/-</span> to Sri Seetha Rama Trust.</td><td>Estancia Club House Hall</td></tr>
-                <tr><td>25 Feb 2023</td><td>Musical discourse by <span class="highlight-text">Smt. B. Suchitra & team</span>.</td><td>Estancia Club House Hall</td></tr>
-                <tr><td>18 Feb 2023</td><td>Mahasivarathri pooja & annadhanam.</td><td>Vidya Mandir Temple @ Estancia</td></tr>
-                <tr><td>28 Jan 2023</td><td>Samvatsara abhisegam; Donation of <span class="donation-highlight">Rs. 49,000/-</span> to Vidya Mandir school.</td><td>Vidya Mandir Temple @ Estancia</td></tr>
-                <tr><td>05 Dec 2021</td><td>Sri Sastha Preeti Utsavam; Bhajans by <span class="highlight-text">Sri Veeramanidasan</span>.</td><td>Estancia Club House Hall</td></tr>
-            </tbody>
-        </table>
-    </div>
 </div>
 
-<div id="about" class="content-section">
-    <h2 class="section-title">Trust Leadership</h2>
-    <div class="leadership-grid">
-        <div class="card">
-            <h3>Office Bearers</h3>
-            <div class="name-item"><strong>Sri. Rammohan</strong><span class="role">Managing Trustee</span></div>
-            <div class="name-item">Sri. Gurumurthy<span class="role">Deputy Managing Trustee</span></div>
-            <div class="name-item">Sri. A.S.Prasad<span class="role">Secretary</span></div>
-            <div class="name-item">Sri. Ramesh Jayaram<span class="role">Treasurer</span></div>
-            <div class="name-item">Sri. Rajakumar<span class="role">Joint Treasurer</span></div>
-            <div class="name-item">Sri. K.V.Suresh<span class="role">Author</span></div>
-        </div>
-        <div class="card">
-            <h3>Trustees</h3>
-            <div class="name-item">Sri. Kousik Ganesh</div><div class="name-item">Sri. Sabarirajan</div>
-            <div class="name-item">Sri. Pattabhiraman</div><div class="name-item">Sri. Krishnan</div>
-            <div class="name-item">Sri. Venkata Krishnan</div><div class="name-item">Sri. Ganesan</div>
-            <div class="name-item">Sri. BhagavanDoss</div><div class="name-item">Sri. Velavan</div>
-            <div class="name-item">Sri. Sivakumar</div><div class="name-item">Sri. Narayanan</div>
-        </div>
-    </div>
-    <div class="card" style="margin-top:20px; text-align: center; border-top-color: var(--gold);">
-        <h3>Legal & Strategic Advisor</h3>
-        <p><strong>Sri. Rajib Hota</strong> (Retd. Income tax Commissioner)</p>
-    </div>
-</div>
-
-<div id="donate" class="content-section">
-    <h2 class="section-title">Donations & Support</h2>
-    <div class="donation-grid">
-        <div class="bank-details">
-            <h3 style="color: var(--maroon); margin-top: 0;">Bank Account</h3>
-            <p><strong>Account Name:</strong> Dharma Paripalana Samithi</p>
-            <p><strong>Account Number:</strong> 500101013016821</p>
-            <p><strong>IFSC Code:</strong> CIUB0000336</p>
-            <p><strong>Bank:</strong> City Union Bank, Guduvanchery Branch</p>
-            <hr style="border:0; border-top:1px solid #eee; margin:15px 0;">
-            <p><strong>UPI ID:</strong> <span class="highlight-text">EZE0098780@CUB</span></p>
-        </div>
-        <div class="qr-card">
-            <h3>Scan & Pay</h3>
-            <img src="qr-code.png" alt="Scan QR Code" onerror="this.src='https://via.placeholder.com/250?text=Scan+QR+Code'">
+<div id="about" class="tab-content">
+    <div class="container">
+        <div class="trustee-grid">
+            <div class="column">
+                <h3>Office Bearers</h3>
+                <div id="mgmt-list"></div>
+            </div>
+            <div class="column">
+                <h3>Board of Trustees</h3>
+                <div id="trustee-list" style="display:grid; grid-template-columns: 1fr 1fr;"></div>
+            </div>
+            <div class="column">
+                <h3>Advisor</h3> 
+                <div id="advisor-list" style="display:grid; grid-template-columns: 1fr 1fr;"></div>
+            </div>
         </div>
     </div>
 </div>
+<div id="donate" class="tab-content">
+    <div class="container">
+        <div style="display: flex; flex-wrap: wrap; gap: 40px; align-items: center; justify-content: center;">
+            
+            <div style="flex: 1; min-width: 250px; text-align: center;">
+                <div style="background: white; padding: 15px; border: 1px solid #eee; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); display: inline-block;">
+                    <img src="images/qr-code.png" alt="UPI QR Code" style="width: 200px; height: 200px; display: block;" onerror="this.src='https://via.placeholder.com/200?text=QR+Code+Missing'">
+                    <p style="margin-top: 10px; color: var(--maroon); font-weight: bold; font-size: 0.9rem;">Scan to Pay via UPI</p>
+                </div>
+            </div>
 
+            <div style="flex: 1; min-width: 300px;">
+                <h2 style="color:var(--maroon); border-left: 5px solid var(--saffron); padding-left: 15px;">Support Our Seva</h2>
+                
+                <div style="background: #fffcf8; border: 1px solid var(--saffron); padding: 20px; border-radius: 8px;">
+                    <table style="margin: 0; border: none; font-size: 1rem; width: 100%;">
+                        <tr style="background: transparent;"><td style="border:none; padding: 5px; font-weight: bold; width: 130px;">Account Name:</td><td style="border:none; padding: 5px;">Dharma Paripalana Samithi Estancia</td></tr>
+                        
+                        <tr style="background: transparent;">
+                            <td style="border:none; padding: 5px; font-weight: bold;">Account No:</td>
+                            <td style="border:none; padding: 5px;">
+                                <span id="accNum">500101013016821</span>
+                                <button onclick="copyText('accNum')" style="margin-left:10px; font-size: 0.7rem; cursor: pointer; padding: 2px 5px;">Copy</button>
+                            </td>
+                        </tr>
+
+                        <tr style="background: transparent;"><td style="border:none; padding: 5px; font-weight: bold;">Bank / IFSC:</td><td style="border:none; padding: 5px;">CUB / CIUB0000336</td></tr>
+                        
+                        <tr style="background: transparent;">
+                            <td style="border:none; padding: 5px; font-weight: bold; color: var(--maroon);">UPI ID:</td>
+                            <td style="border:none; padding: 5px; font-weight: bold; color: var(--maroon);">
+                                <span id="upiId">EZE0098780@CUB</span>
+                                <button onclick="copyText('upiId')" style="margin-left:10px; font-size: 0.7rem; cursor: pointer; padding: 2px 5px;">Copy</button>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <p id="copyStatus" style="font-size: 0.8rem; color: green; margin-top: 5px; height: 1em;"></p>
+                <p style="font-size: 0.85rem; color: #666; font-style: italic;">* Share screenshot to <strong>+91-98407 18054</strong> for receipt.</p>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="contact" class="tab-content">
+    <div class="container">
+        <div style="display: flex; flex-wrap: wrap; gap: 40px;">
+            <div style="flex: 1; min-width: 300px;">
+                <h2 style="color:var(--maroon); border-left: 5px solid var(--saffron); padding-left: 15px;">Get in Touch</h2>
+                <p>For queries regarding events, pooja sponsorships, or volunteering, please reach out to us.</p>
+                <p><strong>📍 Address:</strong> # 5137 Estancia Apartments, Tower 5, GST Road, Vallanchery, Guduvanchery - 603202</p>
+                <p><strong>📞 Phone:</strong> +91-98407 18054</p>
+                <p><strong>✉️ Email:</strong> dps.info@zohomail.in</p>
+            </div>
+
+   <div id="contact-form-container" style="min-height: 400px;flex: 1; min-width: 300px; background: #fdf2e9; padding: 25px; border-radius: 10px;">
+    <form action="https://formspree.io/f/xdaagvbl" method="POST" id="contactForm">
+    <label style="display:block; margin-bottom: 5px; font-weight: bold;">Your Name</label>
+    <input type="text" name="name" maxlength="100" required style="width:100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px;">
+
+    <label style="display:block; margin-bottom: 5px; font-weight: bold;">Email Address</label>
+    <input type="email" name="_replyto" required style="width:100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px;">
+
+    <label style="display:block; margin-bottom: 5px; font-weight: bold;">Are you an Estancia Resident?</label>
+    <select name="is_resident" id="residentCheck" onchange="toggleFlatField()" style="width:100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px;">
+        <option value="No">No</option>
+        <option value="Yes">Yes</option>
+    </select>
+
+    <div id="flatField" style="display:none;">
+        <label style="display:block; margin-bottom: 5px; font-weight: bold;">Flat Number (4 Digits)</label>
+        <input type="text" id="flatNum" name="flat_number" placeholder="e.g., 5137" maxlength="4" 
+               oninput="validateFlat()" 
+               style="width:100%; padding: 10px; margin-bottom: 5px; border: 1px solid #ccc; border-radius: 4px;">
+        <p id="flatError" style="color: red; font-size: 0.8rem; margin: 0 0 15px 0; display: none;">Invalid Flat Number format.</p>
+    </div>
+
+    <label style="display:block; margin-bottom: 5px; font-weight: bold;">Message</label>
+    <textarea id="messageBox" name="message" rows="4" oninput="updateCount()" maxlength="1000" required style="width:100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px;"></textarea>
+    
+    <div style="text-align: right; margin-bottom: 15px;">
+        <small id="charCounter" style="color: #666;">0 / 1000 characters</small>
+    </div>
+
+    <div style="margin-bottom: 15px; text-align: left;">
+    <label style="display: flex; align-items: flex-start; cursor: pointer; font-size: 0.85rem; color: #555;">
+        <input type="checkbox" name="privacy_policy" required style="margin-top: 4px; margin-right: 10px;">
+        <span>
+            I agree that the information provided (including my email and flat number) will only be used by 
+            <strong>Dharma Paripalana Samithi</strong> to respond to this inquiry. 
+            No data will be shared with third parties or used for unrelated purposes.
+        </span>
+    </label>
+    </div>
+    <div style="display:none;">
+    <label>Leave this field blank</label>
+    <input type="text" name="_honeypot" id="honeypot">
+    </div>
+
+    <button type="submit" id="submitBtn" style="background: var(--maroon); color: white; padding: 12px 25px; border: none; border-radius: 5px; cursor: pointer; width: 100%; font-weight: bold;">
+    <span class="spinner"></span>
+    <span id="btnText">SEND MESSAGE</span>
+    </button>
+
+    </form>
+    <div id="successMessage" style="display:none; text-align:center; padding: 40px; background: #fffcf8; border: 2px solid var(--saffron); border-radius: 10px;">
+        <h3 style="color: var(--maroon);">🙏 Om Namah Shivaya</h3>
+        <p>Thank you for reaching out. Your message has been sent successfully. We will get back to you shortly.</p>
+        <button onclick="resetForm()" style="background:none; border:none; color:var(--maroon); text-decoration:underline; cursor:pointer;">Send another message</button>
+    </div>
+   </div>
+   </div>
+  </div>
+</div>
 <footer>
-    <div style="max-width: 1100px; margin: 0 auto; text-align: left; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px;">
-        <div>
-            <h4 style="color: var(--saffron);">Official Address</h4>
-            <p style="font-size: 0.9rem;"># 5137 Estancia Apartments, Tower #5,<br>GST Road, Vallanchery, Guduvanchery (PO),<br>Tamil Nadu - 603202.</p>
-        </div>
-        <div>
-            <h4 style="color: var(--saffron);">Connect</h4>
-            <p style="font-size: 0.9rem;"><strong>Email:</strong> dps.info@zohomail.in | dps.estancia@gmail.com<br>
-            <strong>Phone:</strong> +91-98407 18054</p>
-        </div>
-    </div>
-    <p style="font-size: 0.8rem; margin-top: 30px;">© 2026 Dharma Paripalana Samithi Estancia. All Rights Reserved.</p>
+    <p><strong>Dharma Paripalana Samithi Estancia</strong></p>
+    <p># 5137 Estancia Apartments, GST Road, Vallanchery, Guduvanchery - 603202</p>
+    <p>Email: dps.info@zohomail.in | Ph: +91-98407 18054</p>
 </footer>
 
 <script>
-    function openTab(evt, tabName) {
-        var i, content, tablinks;
-        content = document.getElementsByClassName("content-section");
-        for (i = 0; i < content.length; i++) { content[i].classList.remove("active"); }
-        tablinks = document.getElementsByTagName("button");
-        for (i = 0; i < tablinks.length; i++) { tablinks[i].classList.remove("active"); }
-        document.getElementById(tabName).classList.add("active");
-        evt.currentTarget.classList.add("active");
+    // --- APP STATE ---
+const config = {
+    events: 'data/events.csv',
+    trustees: 'data/trustees.csv',
+    manifest: 'data/manifest.csv',
+    highlightsDir: 'highlights/',
+    logoPath: 'images/logo.png',
+    qrPath: 'images/qr-code.png'
+};
+
+// Also update the logo error handler if you have one
+const logoImg = document.getElementById('main-logo');
+if (logoImg) logoImg.src = config.logoPath;
+    // --- TAB LOGIC ---
+    function switchTab(id) {
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        event.currentTarget.classList.add('active');
         window.scrollTo(0,0);
     }
 
-    let slideIndex = 0;
-    function showSlides() {
-        let i;
-        let slides = document.getElementsByClassName("mySlides");
-        for (i = 0; i < slides.length; i++) { slides[i].style.display = "none"; }
-        slideIndex++;
-        if (slideIndex > slides.length) {slideIndex = 1}    
-        if(slides.length > 0) slides[slideIndex-1].style.display = "block";  
-        setTimeout(showSlides, 4000);
+    // --- DATA LOADING ---
+    async function loadCSV(file) {
+        try {
+            const res = await fetch(file);
+            const text = await res.text();
+            return text.split('\n').map(row => row.split(',')).filter(row => row.length > 1);
+        } catch (e) { console.error("Error loading " + file, e); return []; }
     }
-    window.onload = function() { showSlides(); };
+// --- UPDATED INITIALIZE DATA ---
+async function initApp() {
+    // 1. Handle Logo Fallback
+    const logo = document.getElementById('main-logo');
+    if(logo) logo.onerror = () => { logo.style.display = 'none'; };
+
+    // 2. Fetch all your CSV data first
+    const events = await loadCSV(config.events);
+    const trustees = await loadCSV(config.trustees);
+    const photoData = await loadCSV(config.manifest);
+
+    // --- PASTE THE NEW SIDEBAR LOGIC HERE ---
+
+    // A. Populate "Upcoming Events" Sidebar Box
+    const upcomingContainer = document.getElementById('upcoming-list');
+const monthlySidebar = document.getElementById('monthly-sidebar-list');
+
+if (upcomingContainer && monthlySidebar) {
+    const now = new Date();
+
+    // 1. FILTER SPECIAL EVENTS (Future only)
+    const specials = events.slice(1)
+        .filter(row => {
+            const dateObj = new Date(row[0].trim());
+            return row[3].trim().toLowerCase() !== 'monthly' && !isNaN(dateObj) && dateObj >= now;
+        })
+        .sort((a, b) => new Date(a[0]) - new Date(b[0]))
+        .slice(0, 2); // Show top 2
+
+    // 2. FILTER MONTHLY REGULARS
+    const regulars = events.slice(1)
+        .filter(row => row[3].trim().toLowerCase() === 'monthly')
+        .slice(0, 2); // Show top 2
+
+    // Render Specials with your requested formatting
+    upcomingContainer.innerHTML = specials.map(row => {
+        const d = new Date(row[0].trim());
+        const formatted = d.toLocaleDateString('en-GB', { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/,/g, '');
+        return `<li style="padding:5px 0; font-size:0.85rem;"><strong style="color:var(--maroon);">${formatted}</strong><br>${row[1]}</li>`;
+    }).join('') || "<li>Stay tuned for updates!</li>";
+
+    // Render Regulars
+    monthlySidebar.innerHTML = regulars.map(row => 
+        `<li style="padding:5px 0; font-size:0.85rem;"><strong style="color:#555;">${row[0]}:</strong> ${row[1]}</li>`
+    ).join('');
+}
+    // B. Populate "Mini Gallery" Sidebar Box
+    const miniGallery = document.getElementById('mini-gallery');
+    if (miniGallery) {
+        const recentPhotos = photoData.slice(1, 5); // Take top 4 from manifest.csv
+        miniGallery.innerHTML = recentPhotos.map(p => 
+            `<img src="${config.highlightsDir}${p[0].trim()}" style="width:100%; height:70px; object-fit:cover; border-radius:4px;" onerror="this.src='https://via.placeholder.com/70?text=Image'">`
+        ).join('');
+    }
+
+    // --- END OF NEW SIDEBAR LOGIC ---
+
+    // 3. Existing logic for the full Tables (Monthly/Yearly)
+    renderEventTables(events); // (Assuming you grouped your table logic here)
+
+    // 4. Existing logic for the Trustees
+    renderTrustees(trustees);
+
+    // 5. Existing logic for the main Hero Slideshow
+    startHeroSlideshow(photoData);
+}
+    async function renderEventTables(events) {
+        const monthlyTable = document.getElementById('monthly-list');
+        const yearlyTable = document.getElementById('yearly-list');
+        events.slice(1).forEach(row => {
+            if (row.length < 4) return; // Skip incomplete rows
+            
+            const [date, detail, venue, type] = row;
+            const htmlRow = `<tr><td>${date}</td><td>${detail}</td><td>${venue}</td></tr>`;
+            
+            if (type.trim().toLowerCase() === 'monthly') {
+                monthlyTable.innerHTML += htmlRow;
+            } else {
+                yearlyTable.innerHTML += htmlRow;
+            }
+        });
+    }
+    async function renderTrustees(trustees) {
+        // 3. Load Trustees
+       // const trustees = await loadCSV(config.trustees);
+        const mgmtList = document.getElementById('mgmt-list');
+        const trustList = document.getElementById('trustee-list');
+        const advisorList = document.getElementById('advisor-list');
+        trustees.slice(1).forEach(row => {
+            if(row[2].trim().toLowerCase() === 'management') {
+                mgmtList.innerHTML += `<div class="name-card"><strong>${row[0]}</strong><br><small style="color:#666">${row[1]}</small></div>`;
+            } else if (row[2].trim().toLowerCase() === 'advisor') {
+                advisorList.innerHTML += `<div class="name-card"><strong>${row[0]}</strong><br><small style="color:#666">${row[1]}</small></div>`;
+            } else {
+                trustList.innerHTML += `<div class="name-card"><strong>${row[0]}</strong></div>`;
+            }
+        });
+    }
+
+        // 4. Load Slideshow from Manifest
+    async function startHeroSlideshow(photoData) {
+        //const photoData = await loadCSV(config.manifest);
+        const photos = photoData.slice(1);
+        if(photos.length > 0) {
+            let idx = 0;
+            const box = document.getElementById('slideshow-box');
+            const cap = document.getElementById('slide-caption');
+            
+            const nextSlide = () => {
+                const [file, caption] = photos[idx];
+                box.style.backgroundImage = `url(${config.highlightsDir}${file.trim()})`;
+                cap.innerText = caption ? caption.trim() : "Dharma Paripalana Samithi";
+                idx = (idx + 1) % photos.length;
+            };
+            nextSlide();
+            setInterval(nextSlide, 5000);
+        }
+    }
+    function copyText(elementId) {
+    const text = document.getElementById(elementId).innerText;
+    navigator.clipboard.writeText(text).then(() => {
+        const status = document.getElementById('copyStatus');
+        status.innerText = "Copied to clipboard!";
+        setTimeout(() => { status.innerText = ""; }, 2000);
+    });
+}
+function toggleFlatField() {
+    const isResident = document.getElementById('residentCheck').value;
+    const flatField = document.getElementById('flatField');
+    const flatInput = document.getElementById('flatNum');
+    
+    if (isResident === 'Yes') {
+        flatField.style.display = 'block';
+        flatInput.setAttribute('required', 'true');
+    } else {
+        flatField.style.display = 'none';
+        flatInput.removeAttribute('required');
+        flatInput.value = ""; // Clear if hidden
+    }
+}
+
+function validateFlat() {
+    const val = document.getElementById('flatNum').value;
+    const error = document.getElementById('flatError');
+    const submitBtn = document.getElementById('submitBtn');
+    
+    // Rule Logic:
+    // ^[1-5] : Tower 1-5
+    // (0[1-9]|1[0-7]) : Floor 01-17
+    // [1-8]$ : Flat 1-8
+    const flatPattern = /^[1-5](0[1-9]|1[0-7])[1-8]$/;
+
+    if (val.length === 4) {
+        if (flatPattern.test(val)) {
+            error.style.display = 'none';
+            submitBtn.disabled = false;
+            submitBtn.style.opacity = "1";
+        } else {
+            error.innerText = "Tower(1-5), Floor(01-17), Flat(1-8). e.g. 5137";
+            error.style.display = 'block';
+            submitBtn.disabled = true;
+            submitBtn.style.opacity = "0.5";
+        }
+    } else {
+        error.style.display = 'none';
+    }
+}
+
+// Grab elements
+const contactForm = document.getElementById("contactForm");
+const successMessage = document.getElementById("successMessage");
+const submitButton = document.getElementById("submitBtn");
+const buttonText = document.getElementById("btnText");
+
+async function handleSubmit(event) {
+    event.preventDefault();
+    
+    // --- 1. RATE LIMITING (60-second Cooldown) ---
+    const lastSub = localStorage.getItem('dps_last_submit');
+    const now = Date.now();
+    const cooldown = 60000; // 60 seconds in milliseconds
+
+    if (lastSub && (now - lastSub < cooldown)) {
+        const remaining = Math.ceil((cooldown - (now - lastSub)) / 1000);
+        alert(`Please wait ${remaining} seconds before sending another message. This prevents spam.`);
+        return;
+    }
+
+    // --- 2. ANTI-SPAM HONEYPOT ---
+    if (document.getElementById("honeypot").value !== "") {
+        return; 
+    }
+
+    // --- 3. INPUT SANITIZATION ---
+    const formData = new FormData(event.target);
+    const maliciousPattern = /[<>{}()[\]\\^]/; 
+    let isClean = true;
+
+    for (let [key, value] of formData.entries()) {
+        if (key !== "message" && maliciousPattern.test(value)) { 
+            alert("Special characters detected. Please use plain text.");
+            isClean = false; break;
+        }
+    }
+    if (!isClean) return;
+
+    // --- 4. SUBMISSION PROCESS ---
+    submitBtn.classList.add("loading");
+    btnText.innerText = "SENDING...";
+
+    try {
+        const response = await fetch(event.target.action, {
+            method: form.method,
+            body: formData,
+            headers: { 'Accept': 'application/json' }
+        });
+
+        if (response.ok) {
+            // Success: Update LocalStorage with current timestamp
+            localStorage.setItem('dps_last_submit', Date.now());
+            
+            form.style.display = "none";
+            successMessage.style.display = "block";
+            successMessage.classList.add("visible-element");
+        } else {
+            throw new Error();
+        }
+    } catch (err) {
+        alert("Submission failed. Please try again later.");
+    } finally {
+        submitBtn.classList.remove("loading");
+        btnText.innerText = "SEND MESSAGE";
+    }
+}
+
+async function handleSubmit1(event) {
+    // CRITICAL: This stops the page from refreshing/going blank
+    event.preventDefault(); 
+    
+    console.log("Submission started..."); // Check your console for this
+
+    const data = new FormData(event.target);
+    
+    // Start Loading UI
+    submitButton.classList.add("loading");
+    buttonText.innerText = "SENDING...";
+
+    fetch(event.target.action, {
+        method: contactForm.method,
+        body: data,
+        headers: { 'Accept': 'application/json' }
+    }).then(response => {
+/*        console.log("Response received:", response.status);
+        if (response.ok) {
+            // SUCCESS: Hide the form and show the message
+            contactForm.style.setProperty("display", "none", "important");
+            successMessage.style.setProperty("display", "block", "important");
+            console.log("Success message should now be visible.");*/
+            console.log("Response received:", response.status);
+        if (response.ok) {
+            // SUCCESS: Force the swap
+            contactForm.classList.add("hidden-element");
+            successMessage.classList.remove("hidden-element");
+            successMessage.classList.add("visible-element");
+            
+            console.log("Success message classes updated.");
+        } else {
+            alert("There was an error with the server. Please try again.");
+        }
+    }).catch(error => {
+        console.error("Fetch error:", error);
+        alert("Network error. Please check your connection.");
+    }).finally(() => {
+        submitButton.classList.remove("loading");
+        buttonText.innerText = "SEND MESSAGE";
+    });
+}
+
+// Attach the listener
+if (contactForm) {
+    contactForm.addEventListener("submit", handleSubmit);
+}
+function resetForm() {
+    // 1. Clear all text and selections in the form
+    contactForm.reset();
+    
+    // 2. Hide the resident flat field (since the form reset sets 'Resident' back to 'No')
+    if (typeof toggleFlatField === "function") {
+        toggleFlatField();
+    }
+
+    // 3. Swap visibility back
+    successMessage.classList.add("hidden-element");
+    successMessage.classList.remove("visible-element");
+    
+    contactForm.classList.remove("hidden-element");
+    contactForm.style.display = "block"; // Ensure it shows up
+
+    // 4. Scroll back to the top of the form for the user
+    contactForm.scrollIntoView({ behavior: 'smooth' });
+
+    // 5. Reset character counter
+    document.getElementById("charCounter").innerText = "0 / 1000 characters";
+    document.getElementById("charCounter").style.color = "#666";
+}
+function updateCount() {
+    const messageBox = document.getElementById("messageBox");
+    const counter = document.getElementById("charCounter");
+    const currentLength = messageBox.value.length;
+    const maxLength = 1000;
+
+    // Update the text
+    counter.innerText = `${currentLength} / ${maxLength} characters`;
+
+    // Visual feedback: Turn red if over 900 characters
+    if (currentLength >= 900) {
+        counter.style.color = "red";
+        counter.style.fontWeight = "bold";
+    } else {
+        counter.style.color = "#666";
+        counter.style.fontWeight = "normal";
+    }
+}
+window.onload = initApp;
 </script>
 
 </body>
