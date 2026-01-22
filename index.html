@@ -302,58 +302,135 @@
 </div>
 <div id="donate" class="tab-content">
     <div class="container">
-        <div style="display: flex; flex-wrap: wrap; gap: 40px; align-items: center; justify-content: center;">
+        <div style="background: #fff8e1; border: 2px dashed #d4af37; padding: 15px; border-radius: 8px; margin-bottom: 30px; text-align: center;">
+            <h3 style="color: var(--maroon); margin: 0; font-size: 1.2rem;">📜 Tax Benefits (Section 80G)</h3>
+            <p style="margin: 5px 0 0; font-weight: bold;">
+                Donations are eligible for tax deduction. Name in form must match PAN records.
+            </p>
+        </div>
+
+        <div class="home-grid" style="grid-template-columns: 1fr 1.2fr; gap: 30px;">
             
-            <div style="flex: 1; min-width: 250px; text-align: center;">
-                <div style="background: white; padding: 15px; border: 1px solid #eee; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); display: inline-block;">
-                    <img src="images/qr-code.png" alt="UPI QR Code" style="width: 200px; height: 200px; display: block;" onerror="this.src='https://via.placeholder.com/200?text=QR+Code+Missing'">
-                    <p style="margin-top: 10px; color: var(--maroon); font-weight: bold; font-size: 0.9rem;">Scan to Pay via UPI</p>
+            <div class="payment-details">
+                <div class="sidebar-box" style="text-align: center; margin-bottom: 20px; border: 2px solid var(--saffron);">
+                    <img src="images/qr-code.png" alt="UPI QR" style="width: 180px; border: 1px solid #eee; border-radius: 10px;" onerror="this.src='https://via.placeholder.com/180?text=QR+Code'">
+                    <p style="font-weight: bold; color: var(--maroon); margin-top: 10px; margin-bottom: 5px;">Scan to Pay via UPI</p>
+                    <p style="font-size: 0.9rem; background: #fffcf8; padding: 5px; border-radius: 4px; display: inline-block; border: 1px solid #eee;">
+                    <span id="qrUpi" style="font-weight: bold;">EZE0098780@CUB</span>
+                    <button onclick="copyText('qrUpi')" style="border:none; background:none; cursor:pointer; color:var(--maroon); font-size:0.8rem; margin-left:5px;">📋</button>
+                    </p>
+                </div>
+
+                <div class="sidebar-box" style="background: #fffcf8; border: 1px solid var(--saffron);">
+                    <h3 style="font-size: 1rem; margin-bottom: 15px;">Official Bank Details</h3>
+                    
+                    <p style="margin: 8px 0; font-size: 0.95rem;"><strong>A/c Name:</strong><br>Dharma Paripalana Samithi</p>
+                    
+                    <p style="margin: 15px 0 8px;"><strong>Account Number:</strong><br>
+                        <span id="accNum" style="font-family: monospace; font-weight: bold;">500101013016821</span>
+                        <button onclick="copyText('accNum')" style="padding: 2px 8px; font-size: 0.7rem; cursor: pointer; margin-left: 5px;">Copy</button>
+                    </p>
+
+                    <p style="margin: 8px 0;"><strong>Bank / IFSC:</strong><br>City Union Bank / CIUB0000336</p>
+
+                    <p style="margin: 15px 0 5px; color: var(--maroon);"><strong>UPI ID:</strong><br>
+                        <span id="upiId" style="font-weight: bold;">EZE0098780@CUB</span>
+                        <button onclick="copyText('upiId')" style="padding: 2px 8px; font-size: 0.7rem; cursor: pointer; margin-left: 5px;">Copy</button>
+                    </p>
+                    <p id="copyStatus" style="font-size: 0.75rem; color: green; height: 1em; margin-top: 5px;"></p>
                 </div>
             </div>
 
-            <div style="flex: 1; min-width: 300px;">
-                <h2 style="color:var(--maroon); border-left: 5px solid var(--saffron); padding-left: 15px;">Support Our Seva</h2>
-                
-                <div style="background: #fffcf8; border: 1px solid var(--saffron); padding: 20px; border-radius: 8px;">
-                    <table style="margin: 0; border: none; font-size: 1rem; width: 100%;">
-                        <tr style="background: transparent;"><td style="border:none; padding: 5px; font-weight: bold; width: 130px;">Account Name:</td><td style="border:none; padding: 5px;">Dharma Paripalana Samithi</td></tr>
-                        
-                        <tr style="background: transparent;">
-                            <td style="border:none; padding: 5px; font-weight: bold;">Account No:</td>
-                            <td style="border:none; padding: 5px;">
-                                <span id="accNum">500101013016821</span>
-                                <button onclick="copyText('accNum')" style="margin-left:10px; font-size: 0.7rem; cursor: pointer; padding: 2px 5px;">Copy</button>
-                            </td>
-                        </tr>
+            <div class="form-section">
+                <div style="background: #fff; padding: 25px; border-radius: 10px; border: 1px solid #eee; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+                    <h3 style="color: var(--maroon); margin-top: 0; border-bottom: 1px solid var(--saffron); padding-bottom: 10px;">Intimate Your Donation</h3>
+                    <form action="https://formspree.io/f/xdaagvbl" method="POST" id="donationForm">
+                    <label style="display:block; font-weight: bold; font-size: 0.85rem; margin-bottom: 5px;">Donor Full Name (As per PAN)</label>
+                    <input type="text" name="name" required style="width:100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px;">
 
-                        <tr style="background: transparent;"><td style="border:none; padding: 5px; font-weight: bold;">Bank / IFSC:</td><td style="border:none; padding: 5px;">CUB / CIUB0000336</td></tr>
-                        
-                        <tr style="background: transparent;">
-                            <td style="border:none; padding: 5px; font-weight: bold; color: var(--maroon);">UPI ID:</td>
-                            <td style="border:none; padding: 5px; font-weight: bold; color: var(--maroon);">
-                                <span id="upiId">EZE0098780@CUB</span>
-                                <button onclick="copyText('upiId')" style="margin-left:10px; font-size: 0.7rem; cursor: pointer; padding: 2px 5px;">Copy</button>
-                            </td>
-                        </tr>
-                    </table>
+                    <div style="display: flex; gap: 15px;">
+                        <div style="flex: 1;">
+                            <label style="display:block; font-weight: bold; font-size: 0.85rem; margin-bottom: 5px;">PAN Number</label>
+                            <input type="text" name="pan" placeholder="ABCDE1234F" maxlength="10" required style="width:100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; text-transform: uppercase;">
+                        </div>
+                        <div style="flex: 1;">
+                            <label style="display:block; font-weight: bold; font-size: 0.85rem; margin-bottom: 5px;">Mobile Number</label>
+                            <input type="tel" name="phone" required style="width:100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                        </div>
+                    </div>
+
+                    <label style="display:block; font-weight: bold; font-size: 0.85rem; margin: 15px 0 5px;">Purpose of Donation</label>
+                    <select name="purpose" id="donationPurpose" onchange="handleDonationValue()" style="width:100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px;">
+                        <option value="General Donation">General Donation</option>
+                        <option value="Yearly Subscription (Monthly Pooja)">Yearly Subscription (Monthly Pooja) - ₹6000</option>
+                        <option value="Maha Shivarathiri Utsavam">Maha Shivarathiri Utsavam</option>
+                        <option value="Other">Other</option>
+                    </select>
+
+                    <label style="display:block; font-weight: bold; font-size: 0.85rem; margin-bottom: 5px;">Amount Paid (₹)</label>
+                    <input type="number" name="amount" id="donationAmount" required style="width:100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px;">
+
+                    <label style="display:block; font-weight: bold; font-size: 0.85rem; margin-bottom: 5px;">Transaction Ref / UPI ID</label>
+                    <input type="text" name="txn" required style="width:100%; padding: 10px; margin-bottom: 20px; border: 1px solid #ccc; border-radius: 4px;">
+
+                    <div style="display:none;">
+                        <label>Leave this field blank</label>
+                        <input type="text" name="_gotcha" id="donation-honeypot">
+                    </div>
+
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: flex; align-items: flex-start; cursor: pointer; font-size: 0.8rem; color: #555;">
+                        <input type="checkbox" name="terms" required style="margin-top: 3px; margin-right: 10px;">
+                        <span>
+                            I confirm the details provided are correct and match my PAN. I agree that 
+                            <strong>Dharma Paripalana Samithi</strong> will use this data solely for 
+                            issuing the 80G tax receipt and spiritual records.
+                        </span>
+                        </label>
+                    </div>
+
+                    <button type="submit" id="donationSubmitBtn" style="background: var(--maroon); color: white; padding: 12px; border: none; border-radius: 5px; cursor: pointer; width: 100%; font-weight: bold;">
+                    <span class="spinner" id="donationSpinner" style="display:none;"></span>
+                    <span id="donationBtnText">SUBMIT INTIMATION</span>
+                    </button>
+                </form>
                 </div>
-                <p id="copyStatus" style="font-size: 0.8rem; color: green; margin-top: 5px; height: 1em;"></p>
-                <p style="font-size: 0.85rem; color: #666; font-style: italic;">* Share screenshot to <strong>+91-98407 18054</strong> for receipt.</p>
             </div>
         </div>
     </div>
 </div>
+
 <div id="contact" class="tab-content">
     <div class="container">
         <div style="display: flex; flex-wrap: wrap; gap: 40px;">
             <div style="flex: 1; min-width: 300px;">
+                <div style="background: #fffcf8; border: 1px solid #ff0000; padding: 20px; border-radius: 10px; margin-bottom: 30px; display: flex; align-items: center; gap: 20px;">
+                    <div style="font-size: 2.5rem;">📽️</div>
+                        <div>
+                            <h3 style="margin: 0; color: #ff0000;">Experience Our Divine Services</h3>
+                            <p style="margin: 5px 0 0; font-size: 0.95rem;">
+                                Watch recordings of our Homams, Poojas, and Utsavams on our official YouTube channel.
+                            </p>
+                            <a href="https://www.youtube.com/channel/UCQKjmSJNNT15ScwyXr3_AhA" target="_blank" 
+                            style="display: inline-block; margin-top: 10px; background: #ff0000; color: white; padding: 8px 15px; border-radius: 5px; text-decoration: none; font-weight: bold; font-size: 0.85rem;">
+                            VISIT OUR YOUTUBE CHANNEL
+                            </a>
+                        </div>
+                    </div>
                 <h2 style="color:var(--maroon); border-left: 5px solid var(--saffron); padding-left: 15px;">Get in Touch</h2>
                 <p>For queries regarding events, pooja sponsorships, or volunteering, please reach out to us.</p>
                 <p><strong>📍 Address:</strong> # 5137 Estancia Apartments, Tower 5, GST Road, Vallanchery, Guduvanchery - 603202</p>
-                <p><strong>📞 Phone:</strong> +91-98407 18054</p>
+    
+                <p><strong>📞 Phone:</strong> 
+                <span id="phone-container">
+                    <button onclick="revealPhone()" style="background: var(--saffron); border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: bold; color: var(--maroon);">
+                    Click to show number
+                    </button>
+                </span>
+                </p>
+    
                 <p><strong>✉️ Email:</strong> dps.info@zohomail.in</p>
             </div>
-
    <div id="contact-form-container" style="min-height: 400px;flex: 1; min-width: 300px; background: #fdf2e9; padding: 25px; border-radius: 10px;">
     <form action="https://formspree.io/f/xdaagvbl" method="POST" id="contactForm">
     <label style="display:block; margin-bottom: 5px; font-weight: bold;">Your Name</label>
@@ -414,11 +491,16 @@
   </div>
 </div>
 <footer>
-    <p><strong>Dharma Paripalana Samithi Estancia</strong></p>
+    <p><strong>Dharma Paripalana Samithi</strong></p>
     <p># 5137 Estancia Apartments, GST Road, Vallanchery, Guduvanchery - 603202</p>
-    <p>Email: dps.info@zohomail.in | Ph: +91-98407 18054</p>
+    <p>
+        ✉️ Email: dps.info@zohomail.in | 
+        📺 YouTube: <a href="https://www.youtube.com/channel/UCQKjmSJNNT15ScwyXr3_AhA" target="_blank" style="color: var(--saffron); text-decoration: none; font-weight: bold;">@DharmaParipalanaSamithi</a> | 
+        Ph: <span id="footer-phone">
+            <a href="javascript:void(0)" onclick="revealFooterPhone()" style="color: var(--saffron); text-decoration: underline;">Show Number</a>
+        </span>
+    </p>
 </footer>
-
 <script>
 
 // --- APP STATE ---
@@ -489,6 +571,8 @@ async function initApp() {
 
     // 5. Existing logic for the main Hero Slideshow
     startHeroSlideshow(photoData);
+
+    handleDonationFormSubmission();
     
 }
 
@@ -818,7 +902,7 @@ function renderMonthWiseView(rows) {
         if (cols.length < 2) return;
         
         const dateObj = new Date(cols[0].trim());
-        if (isNaN(dateObj)) return;
+        if (isNaN(dateObj) || dateObj < new Date()) return;
 
         const monthKey = dateObj.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
         
@@ -909,6 +993,93 @@ async function updateSidebar(calendarRows) {
     } catch (e) { console.error("Error loading monthly calendar", e); }
 }
 
+function handleDonationValue() {
+    const purpose = document.getElementById('donationPurpose').value;
+    const amountField = document.getElementById('donationAmount');
+
+    if (purpose.includes("Yearly Subscription")) {
+        amountField.value = 6000;
+        amountField.setAttribute('readonly', true);
+        amountField.style.background = "#f0f0f0";
+        amountField.style.cursor = "not-allowed";
+    } else {
+        amountField.removeAttribute('readonly');
+        amountField.style.background = "#ffffff";
+        amountField.style.cursor = "text";
+        if (amountField.value == 6000) amountField.value = ""; 
+    }
+}
+// Ensure it runs once on load to set the initial state
+window.addEventListener('DOMContentLoaded', handleDonationValue);
+function revealPhone() {
+    // The phone number is encoded as 'KzkxLTk4NDA3IDE4MDU0' (Base64 for +91-98407 18054)
+    const encodedNum = "KzkxLTk4NDA3IDE4MDU0"; 
+    const decodedNum = atob(encodedNum);
+    
+    const container = document.getElementById('phone-container');
+    container.innerHTML = `<a href="tel:${decodedNum.replace(/\s/g, '')}" style="color: var(--maroon); font-weight: bold; text-decoration: none;">${decodedNum}</a>`;
+}
+function revealDonatePhone() {
+    // Decodes +91-98407 18054
+    const num = atob("KzkxLTk4NDA3IDE4MDU0");
+    document.getElementById('donate-phone-container').innerHTML = `<strong>${num}</strong>`;
+}
+function revealFooterPhone() {
+    const num = atob("KzkxLTk4NDA3IDE4MDU0");
+    document.getElementById('footer-phone').innerHTML = num;
+}
+
+function handleDonationFormSubmission(){
+    document.getElementById("donationForm").addEventListener("submit", async function(e) {
+    e.preventDefault();
+    
+    // 1. Honeypot check
+    if (document.getElementById("donation-honeypot").value !== "") return;
+    // 2. UI Feedback
+    const btn = document.getElementById("donationSubmitBtn");
+    const spinner = document.getElementById("donationSpinner");
+    const btnText = document.getElementById("donationBtnText");
+
+    btn.disabled = true;
+    spinner.style.display = "inline-block";
+    btnText.innerText = "PROCESSING...";
+
+    // 3. Sanitization & Submission
+    const formData = new FormData(this);
+    const maliciousPattern = /[<>{}()[\]\\^]/;
+    
+    let isClean = true;
+    for (let value of formData.values()) {
+        if (maliciousPattern.test(value)) {
+            alert("Special characters detected. Please use plain text.");
+            isClean = false; 
+            break;
+        }
+    }
+    if (isClean) {
+        try {
+            const response = await fetch(this.action, {
+                method: 'POST',
+                body: formData,
+                headers: { 'Accept': 'application/json' }
+            });
+            if (response.ok) {
+                alert("Thank you! Your donation intimation has been sent successfully.");
+                this.reset();
+                handleDonationValue(); // Reset the amount field logic
+            } else {
+                throw new Error();
+            }
+        } catch (err) {
+            alert("Submission failed. Please try again later.");
+        }
+    }
+
+    btn.disabled = false;
+    spinner.style.display = "none";
+    btnText.innerText = "SUBMIT INTIMATION";
+    });
+}
 window.onload = initApp;
 </script>
 
