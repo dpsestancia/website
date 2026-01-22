@@ -170,6 +170,36 @@
 .month-card li:last-child {
     border-bottom: none;
 }
+.side-link {
+    text-decoration: none;
+    color: var(--maroon);
+    font-weight: bold;
+    padding: 10px;
+    border-radius: 5px;
+    background: #fff;
+    border: 1px solid #eee;
+    transition: 0.3s;
+    font-size: 0.9rem;
+}
+
+.side-link:hover {
+    background: var(--saffron);
+    color: white;
+    border-color: var(--saffron);
+}
+
+/* Ensure layout stays clean on mobile */
+@media (max-width: 900px) {
+    #activities .container { flex-direction: column; }
+    .side-nav { 
+        position: relative !important; 
+        top: 0 !important; 
+        flex-direction: row !important; 
+        flex-wrap: wrap; 
+        width: 100%; 
+        flex: none !important;
+    }
+}
     </style>
 </head>
 <body>
@@ -230,54 +260,55 @@
         </div>
     </div>
 </div>
-
 <div id="activities" class="tab-content">
-    <div class="container">
-        <div style="text-align: right; margin-bottom: 20px;">
-            <a href="#sankalpam-section" style="background: var(--saffron); color: var(--maroon); padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; font-size: 0.9rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                📝 REGISTER FOR SANKALPAM
-            </a>
-        </div>
-        <section id="monthly-calendar-section" style="margin-top: 50px; margin-bottom: 50px;">
-            <h2 style="color:var(--maroon); border-left: 5px solid var(--saffron); padding-left: 15px;">🗓️ 2026 Monthly Pooja Calendar</h2>
-            <p style="margin-bottom: 20px; color: #666; font-style: italic;">Detailed monthly dates for Pradosham and Sankatahara Chaturthi.</p>
-            
-            <div id="calendar-grid" class="calendar-grid-layout">
+    <div class="container" style="display: flex; gap: 30px; align-items: flex-start;">
+        
+        <nav class="side-nav" style="flex: 0 0 200px; position: sticky; top: 100px; display: flex; flex-direction: column; gap: 10px;">
+            <h4 style="color: var(--maroon); margin-bottom: 10px; text-align: center; border-bottom: 2px solid var(--saffron); font-size: 1rem;">Activities</h4>
+            <a href="#monthly-calendar-section" class="side-link">🗓️ Monthly Pooja Calendar</a>
+            <a href="#special-events-section" class="side-link">📅 Special Events</a>
+            <a href="#sankalpam-section" class="side-link">📝 Sankalpam Registration</a>
+        </nav>
+
+        <div style="flex: 1; min-width: 0;">
+            <div style="text-align: right; margin-bottom: 20px;">
+                <a href="#sankalpam-section" style="background: var(--saffron); color: var(--maroon); padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; font-size: 0.9rem;">
+                    📝 REGISTER FOR SANKALPAM
+                </a>
+            </div>
+
+            <section id="monthly-calendar-section" style="scroll-margin-top: 100px;">
+                <h2 style="color:var(--maroon); border-left: 5px solid var(--saffron); padding-left: 15px;">2026 Monthly Pooja Calendar</h2>
+                <div id="calendar-grid" class="calendar-grid-layout" style="margin-bottom: 50px;"></div>
+            </section>
+
+            <section id="special-events-section" style="scroll-margin-top: 100px; margin-bottom: 50px;">
+                <h2 style="color:var(--maroon); border-left: 5px solid var(--saffron); padding-left: 15px;">Special Events</h2>
+                <table>
+                    <thead>
+                        <tr><th>Date</th><th>Activity Detail</th><th>Venue</th><th>Media</th></tr>
+                    </thead>
+                    <tbody id="yearly-list"></tbody>
+                </table>
+            </section>
+
+            <section id="sankalpam-section" style="padding: 25px; background: #fffcf8; border: 2px solid var(--saffron); border-radius: 10px; scroll-margin-top: 100px;">
+                <h3 style="color: var(--maroon); margin-top: 0; border-bottom: 1px solid var(--saffron); padding-bottom: 10px;">
+                    Family Sankalpam Registration
+                </h3>
+                <p style="font-size: 0.9rem; margin-bottom: 20px;">New members are requested to provide their family details (Gothram, Nakshatram, etc.) for our permanent records.</p>
+                
+                <div class="jotform-container" style="width: 100%; min-height: 550px;">
+                    <iframe
+                        id="JotFormIFrame-222271804667054"
+                        title="Sankalpam Registration"
+                        src="https://form.jotform.com/222271804667054"
+                        frameborder="0"
+                        style="width: 100%; height: 539px; border:none;"
+                        scrolling="no">
+                    </iframe>
                 </div>
-        </section>
-
-        <h2 style="color:var(--maroon); border-left: 5px solid var(--saffron); padding-left: 15px; margin-top: 50px;">Special Events & Yearly Calendar</h2>
-        <table>
-            <thead>
-                <tr><th>Date/Occasion</th><th>Activity Detail</th><th>Venue</th><th>Media</th></tr>
-            </thead>
-            <tbody id="yearly-list"></tbody>
-        </table>
-
-        <div id="sankalpam-section" style="margin-top: 40px; padding: 25px; background: #fffcf8; border: 2px solid var(--saffron); border-radius: 10px; scroll-margin-top: 80px;">
-            <h3 style="color: var(--maroon); margin-top: 0; border-bottom: 1px solid var(--saffron); padding-bottom: 10px;">
-            Family Sankalpam Registration
-            </h3>
-            <p>New members are requested to provide their family details (Gothram, Nakshatram, etc.) for our permanent records.</p>
-            <div class="jotform-container" style="width: 100%; min-height: 550px;">
-                <iframe
-                id="JotFormIFrame-222271804667054"
-                title="Sankalpam"
-                onload="window.parent.scrollTo(0,0)"
-                allowtransparency="true"
-                allow="geolocation; microphone; camera; fullscreen; payment"
-                src="https://form.jotform.com/222271804667054"
-                frameborder="0"
-                style="min-width:100%;max-width:100%;height:539px;border:none;"
-                scrolling="no">
-                </iframe>
-                <script src='https://cdn.jotfor.ms/s/umd/latest/for-form-embed-handler.js'></script>
-                <script>window.jotformEmbedHandler("iframe[id='JotFormIFrame-222271804667054']", "https://form.jotform.com/")</script>
-            </div>
-    
-            <div style="text-align: right; margin-top: 10px;">
-                <a href="#navbar" style="font-size: 0.8rem; color: var(--maroon); text-decoration: none;">↑ Back to Top</a>
-            </div>
+            </section>
         </div>
     </div>
 </div>
