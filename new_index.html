@@ -1,0 +1,1506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dharma Paripalana Samithi - Estancia</title>
+    <link rel="icon" type="image/png" href="images/logo.png">
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/papaparse@5.4.1/papaparse.min.js"></script>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        
+        // SVG Icon Components
+        const Calendar = ({ size = 20, className = "" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+        );
+
+        const Users = ({ size = 20, className = "" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+        );
+
+        const ImageIcon = ({ size = 20, className = "" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                <polyline points="21 15 16 10 5 21"></polyline>
+            </svg>
+        );
+
+        const Menu = ({ size = 20, className = "" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+        );
+
+        const X = ({ size = 20, className = "" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+        );
+
+        const ChevronLeft = ({ size = 20, className = "" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+        );
+
+        const ChevronRight = ({ size = 20, className = "" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+        );
+
+        const MapPin = ({ size = 20, className = "" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                <circle cx="12" cy="10" r="3"></circle>
+            </svg>
+        );
+
+        const Youtube = ({ size = 20, className = "" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"></path>
+                <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon>
+            </svg>
+        );
+
+        const ExternalLink = ({ size = 20, className = "" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                <polyline points="15 3 21 3 21 9"></polyline>
+                <line x1="10" y1="14" x2="21" y2="3"></line>
+            </svg>
+        );
+
+        const Phone = ({ size = 20, className = "" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+            </svg>
+        );
+
+        const Mail = ({ size = 20, className = "" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                <polyline points="22,6 12,13 2,6"></polyline>
+            </svg>
+        );
+
+        const MapPinIcon = ({ size = 20, className = "" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                <circle cx="12" cy="10" r="3"></circle>
+            </svg>
+        );
+
+        const DharmaParipalanaSamithi = () => {
+            const [activeSection, setActiveSection] = useState('home');
+            const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+            const [currentSlide, setCurrentSlide] = useState(0);
+            const [currentMonth, setCurrentMonth] = useState(new Date());
+            
+            // State for dynamically loaded data
+            const [events, setEvents] = useState([]);
+            const [monthlyEvents, setMonthlyEvents] = useState([]);
+            const [trustees, setTrustees] = useState([]);
+            const [galleryImages, setGalleryImages] = useState([]);
+            const [loading, setLoading] = useState(true);
+
+            // Load CSV files from data directory
+            useEffect(() => {
+                const loadCSVData = async () => {
+                    try {
+                        // Load events.csv
+                        const eventsResponse = await fetch('data/events.csv');
+                        const eventsText = await eventsResponse.text();
+                        const eventsParsed = Papa.parse(eventsText, { header: true, skipEmptyLines: true });
+                        setEvents(eventsParsed.data);
+
+                        // Load monthly_events.csv
+                        const monthlyResponse = await fetch('data/monthly_events.csv');
+                        const monthlyText = await monthlyResponse.text();
+                        const monthlyParsed = Papa.parse(monthlyText, { header: true, skipEmptyLines: true });
+                        setMonthlyEvents(monthlyParsed.data);
+
+                        // Load trustees.csv
+                        const trusteesResponse = await fetch('data/trustees.csv');
+                        const trusteesText = await trusteesResponse.text();
+                        const trusteesParsed = Papa.parse(trusteesText, { header: true, skipEmptyLines: true });
+                        setTrustees(trusteesParsed.data);
+
+                        // Load manifest.csv (generated from highlights directory)
+                        const manifestResponse = await fetch('data/manifest.csv');
+                        const manifestText = await manifestResponse.text();
+                        const manifestParsed = Papa.parse(manifestText, { header: true, skipEmptyLines: true });
+                        setGalleryImages(manifestParsed.data);
+
+                        setLoading(false);
+                    } catch (error) {
+                        console.error('Error loading CSV files:', error);
+                        alert('Error loading data files. Please ensure all CSV files are in the data/ directory and you are running this through a web server.');
+                        setLoading(false);
+                    }
+                };
+
+                loadCSVData();
+            }, []);
+
+            // Auto-advance slideshow
+            useEffect(() => {
+                if (galleryImages.length > 0) {
+                    const timer = setInterval(() => {
+                        setCurrentSlide((prev) => (prev + 1) % galleryImages.length);
+                    }, 4000);
+                    return () => clearInterval(timer);
+                }
+            }, [galleryImages]);
+
+            const parseDate = (dateStr) => {
+                if (!dateStr || dateStr.startsWith('Every')) return null;
+                const parts = dateStr.trim().split('-');
+                if (parts.length === 3) {
+                    return new Date(parts[0], parts[1] - 1, parts[2]);
+                }
+                return null;
+            };
+
+            const formatDate = (dateStr) => {
+                if (!dateStr) return '';
+                if (dateStr.startsWith('Every')) return dateStr;
+                const date = parseDate(dateStr);
+                if (!date) return dateStr;
+                return date.toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' });
+            };
+
+            const parseMediaLinks = (mediaStr) => {
+                if (!mediaStr) return [];
+                const links = mediaStr.split(';').map(link => {
+                    const colonIndex = link.indexOf(':');
+                    if (colonIndex === -1) return null;
+                    const type = link.substring(0, colonIndex).trim();
+                    const url = link.substring(colonIndex + 1).trim();
+                    return { type, url };
+                }).filter(Boolean);
+                return links;
+            };
+
+            const getUpcomingEvents = () => {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                
+                return events
+                    .filter(event => {
+                        const eventDate = parseDate(event.Date);
+                        return eventDate && eventDate >= today;
+                    })
+                    .sort((a, b) => parseDate(a.Date) - parseDate(b.Date))
+                    .slice(0, 5);
+            };
+
+            const getPastEvents = () => {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                
+                return events
+                    .filter(event => {
+                        const eventDate = parseDate(event.Date);
+                        return eventDate && eventDate < today;
+                    })
+                    .sort((a, b) => parseDate(b.Date) - parseDate(a.Date));
+            };
+
+            const getMonthEvents = (year, month) => {
+                return monthlyEvents.filter(event => {
+                    const eventDate = new Date(event.Date);
+                    return eventDate.getFullYear() === year && eventDate.getMonth() === month;
+                });
+            };
+
+            const renderCalendar = () => {
+                const year = currentMonth.getFullYear();
+                const month = currentMonth.getMonth();
+                const firstDay = new Date(year, month, 1);
+                const lastDay = new Date(year, month + 1, 0);
+                const daysInMonth = lastDay.getDate();
+                const startingDayOfWeek = firstDay.getDay();
+                
+                const monthEvents = getMonthEvents(year, month);
+                const eventDates = monthEvents.map(e => new Date(e.Date).getDate());
+                
+                const days = [];
+                for (let i = 0; i < startingDayOfWeek; i++) {
+                    days.push(<div key={`empty-${i}`} className="h-20 border border-gray-200"></div>);
+                }
+                
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const hasEvent = eventDates.includes(day);
+                    const eventOnDay = monthEvents.find(e => new Date(e.Date).getDate() === day);
+                    
+                    days.push(
+                        <div key={day} className={`h-20 border border-gray-200 p-2 ${hasEvent ? 'bg-orange-50' : ''}`}>
+                            <div className="font-semibold text-gray-700">{day}</div>
+                            {hasEvent && (
+                                <div className="text-xs text-orange-600 mt-1 font-medium">
+                                    {eventOnDay.Occasion}
+                                </div>
+                            )}
+                        </div>
+                    );
+                }
+                
+                return days;
+            };
+
+            const navigation = [
+                { id: 'home', label: 'Home', icon: <ImageIcon size={20} /> },
+                { id: 'about', label: 'About Us', icon: <Users size={20} /> },
+                { id: 'events', label: 'Events', icon: <Calendar size={20} /> },
+                { id: 'calendar', label: 'Calendar 2026', icon: <Calendar size={20} /> },
+                { id: 'trustees', label: 'Trustees', icon: <Users size={20} /> },
+                { id: 'donation', label: 'Donate', icon: <ImageIcon size={20} /> },
+                { id: 'contact', label: 'Contact', icon: <ImageIcon size={20} /> }
+            ];
+
+            if (loading) {
+                return (
+                    <div className="min-h-screen bg-gradient-to-b from-orange-50 to-white flex items-center justify-center">
+                        <div className="text-center">
+                            <div className="text-6xl mb-4">🕉️</div>
+                            <p className="text-xl text-gray-600">Loading...</p>
+                        </div>
+                    </div>
+                );
+            }
+
+            return (
+                <div className="min-h-screen bg-gradient-to-b from-orange-50 to-white">
+                    {/* Header */}
+                    <header className="bg-gradient-to-r from-orange-600 to-red-600 text-white shadow-lg sticky top-0 z-50">
+                        <div className="max-w-7xl mx-auto px-4 py-4">
+                            <div className="flex justify-between items-center">
+                                <div className="flex items-center space-x-4">
+                                    <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-lg overflow-hidden">
+                                        <img src="images/logo.png" alt="DPS Logo" className="w-14 h-14 object-contain" onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'block'; }} />
+                                        <span className="text-3xl" style={{display: 'none'}}>🕉️</span>
+                                    </div>
+                                    <div>
+                                        <h1 className="text-2xl md:text-3xl font-bold">Dharma Paripalana Samithi</h1>
+                                        <p className="text-orange-100 text-sm md:text-base">Estancia</p>
+                                        <p className="text-orange-200 text-xs italic">धर्मो रक्षति रक्षितः</p>
+                                    </div>
+                                </div>
+                                
+                                {/* Mobile menu button */}
+                                <button 
+                                    className="md:hidden"
+                                    onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                                >
+                                    {mobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
+                                </button>
+                            </div>
+                            
+                            {/* Desktop Navigation */}
+                            <nav className="hidden md:flex space-x-6 mt-4">
+                                {navigation.map(item => (
+                                    <button
+                                        key={item.id}
+                                        onClick={() => setActiveSection(item.id)}
+                                        className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all ${
+                                            activeSection === item.id 
+                                                ? 'bg-white text-orange-600 shadow-md' 
+                                                : 'hover:bg-orange-700'
+                                        }`}
+                                    >
+                                        {item.icon}
+                                        <span>{item.label}</span>
+                                    </button>
+                                ))}
+                            </nav>
+                            
+                            {/* Mobile Navigation */}
+                            {mobileMenuOpen && (
+                                <nav className="md:hidden mt-4 space-y-2">
+                                    {navigation.map(item => (
+                                        <button
+                                            key={item.id}
+                                            onClick={() => {
+                                                setActiveSection(item.id);
+                                                setMobileMenuOpen(false);
+                                            }}
+                                            className={`flex items-center space-x-2 px-4 py-3 rounded-lg w-full transition-all ${
+                                                activeSection === item.id 
+                                                    ? 'bg-white text-orange-600' 
+                                                    : 'bg-orange-700'
+                                            }`}
+                                        >
+                                            {item.icon}
+                                            <span>{item.label}</span>
+                                        </button>
+                                    ))}
+                                </nav>
+                            )}
+                        </div>
+                    </header>
+
+                    {/* Main Content */}
+                    <main className="max-w-7xl mx-auto px-4 py-8">
+                        {/* Home Section - Slideshow with actual images */}
+                        {activeSection === 'home' && (
+                            <div className="space-y-8">
+                                <div className="relative h-96 bg-gray-900 rounded-xl overflow-hidden shadow-2xl">
+                                    {galleryImages.length > 0 && (
+                                        <img 
+                                            src={`highlights/${galleryImages[currentSlide].filename}`}
+                                            alt={galleryImages[currentSlide].caption}
+                                            className="absolute inset-0 w-full h-full object-cover"
+                                            onError={(e) => { e.target.style.display = 'none'; }}
+                                        />
+                                    )}
+                                    
+                                    <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-r from-orange-900/50 to-red-900/50">
+                                        <div className="text-center text-white z-10 px-4">
+                                            <h2 className="text-4xl md:text-5xl font-bold mb-4">Welcome to Dharma Paripalana Samithi</h2>
+                                            <p className="text-xl md:text-2xl mb-2">Spreading the values of Sanathana Dharma</p>
+                                            <p className="text-lg text-orange-200">Estancia Community, Since 2021</p>
+                                            {galleryImages.length > 0 && (
+                                                <p className="text-sm text-orange-100 mt-4 bg-black/30 inline-block px-4 py-2 rounded-lg">
+                                                    {galleryImages[currentSlide].caption}
+                                                </p>
+                                            )}
+                                        </div>
+                                    </div>
+                                    
+                                    {galleryImages.length > 1 && (
+                                        <>
+                                            <button
+                                                onClick={() => setCurrentSlide((currentSlide - 1 + galleryImages.length) % galleryImages.length)}
+                                                className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white p-2 rounded-full shadow-lg z-20"
+                                            >
+                                                <ChevronLeft className="text-orange-600" />
+                                            </button>
+                                            <button
+                                                onClick={() => setCurrentSlide((currentSlide + 1) % galleryImages.length)}
+                                                className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white p-2 rounded-full shadow-lg z-20"
+                                            >
+                                                <ChevronRight className="text-orange-600" />
+                                            </button>
+                                            
+                                            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2 z-20">
+                                                {galleryImages.map((_, idx) => (
+                                                    <button
+                                                        key={idx}
+                                                        onClick={() => setCurrentSlide(idx)}
+                                                        className={`w-2 h-2 rounded-full transition-all ${idx === currentSlide ? 'bg-white w-8' : 'bg-white/50'}`}
+                                                    />
+                                                ))}
+                                            </div>
+                                        </>
+                                    )}
+                                </div>
+
+                                {/* Upcoming Events Preview */}
+                                <div className="bg-white rounded-xl shadow-lg p-6">
+                                    <h3 className="text-2xl font-bold text-gray-800 mb-4 border-b-2 border-orange-500 pb-2">
+                                        Upcoming Events
+                                    </h3>
+                                    <div className="space-y-4">
+                                        {getUpcomingEvents().length > 0 ? (
+                                            getUpcomingEvents().map((event, idx) => (
+                                                <div key={idx} className="flex items-start space-x-4 p-4 bg-orange-50 rounded-lg hover:bg-orange-100 transition-colors">
+                                                    <div className="flex-shrink-0 w-16 h-16 bg-orange-600 text-white rounded-lg flex flex-col items-center justify-center">
+                                                        <div className="text-xs">{formatDate(event.Date).split(' ')[1]}</div>
+                                                        <div className="text-2xl font-bold">{formatDate(event.Date).split(' ')[0]}</div>
+                                                    </div>
+                                                    <div className="flex-1">
+                                                        <h4 className="font-semibold text-gray-800">{event.Activity}</h4>
+                                                        <p className="text-sm text-gray-600 flex items-center mt-1">
+                                                            <MapPin size={14} className="mr-1" />
+                                                            {event.Venue}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <p className="text-gray-500 text-center py-4">No upcoming events at the moment. Check back soon!</p>
+                                        )}
+                                    </div>
+                                    <button 
+                                        onClick={() => setActiveSection('events')}
+                                        className="mt-4 w-full bg-orange-600 text-white py-2 rounded-lg hover:bg-orange-700 transition-colors"
+                                    >
+                                        View All Events
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* About Section */}
+                        {activeSection === 'about' && (
+                            <div className="bg-white rounded-xl shadow-lg p-8">
+                                <h2 className="text-3xl font-bold text-gray-800 mb-6 border-b-2 border-orange-500 pb-2">
+                                    About Us
+                                </h2>
+                                <div className="prose max-w-none">
+                                    <p className="text-lg text-gray-700 mb-4 leading-relaxed">
+                                        <strong className="text-orange-600">Dharma Paripalana Samithi Estancia</strong> is a religious and charitable institution founded in <strong>2021</strong>. It is managed by trustees comprising of Estancia complex flat owners with varied experience dedicated to promoting and spreading the values of Sanathana Dharma.
+                                    </p>
+                                    <p className="text-lg text-gray-700 mb-4 leading-relaxed">
+                                        The Samithi serves as a spiritual anchor for the Estancia community, organizing regular Bhajans, Poojas, and philanthropic activities like Annadhanam.
+                                    </p>
+                                    
+                                    <div className="mt-8 bg-orange-50 p-6 rounded-lg border-l-4 border-orange-600">
+                                        <h3 className="text-xl font-semibold text-gray-800 mb-3">Our Mission</h3>
+                                        <p className="text-gray-700 italic text-lg">
+                                            "धर्मो रक्षति रक्षितः" (Dharmo Rakshathi Rakshithah)
+                                        </p>
+                                        <p className="text-gray-600 mt-2">
+                                            Dharma protects those who protect it. We are committed to preserving and promoting the eternal values of Sanathana Dharma through community worship, spiritual education, and charitable service.
+                                        </p>
+                                    </div>
+
+                                    <div className="mt-8 grid md:grid-cols-3 gap-6">
+                                        <div className="bg-gradient-to-br from-orange-100 to-red-100 p-6 rounded-lg text-center">
+                                            <div className="text-4xl mb-2">🙏</div>
+                                            <h4 className="font-semibold text-gray-800 mb-2">Regular Poojas</h4>
+                                            <p className="text-sm text-gray-600">Monthly Pradosham and Sankatahara Chathurthi with Vedic chanting</p>
+                                        </div>
+                                        <div className="bg-gradient-to-br from-orange-100 to-red-100 p-6 rounded-lg text-center">
+                                            <div className="text-4xl mb-2">🎵</div>
+                                            <h4 className="font-semibold text-gray-800 mb-2">Bhajans & Concerts</h4>
+                                            <p className="text-sm text-gray-600">Devotional music and spiritual discourses by renowned artists</p>
+                                        </div>
+                                        <div className="bg-gradient-to-br from-orange-100 to-red-100 p-6 rounded-lg text-center">
+                                            <div className="text-4xl mb-2">🍛</div>
+                                            <h4 className="font-semibold text-gray-800 mb-2">Annadhanam</h4>
+                                            <p className="text-sm text-gray-600">Community service through food distribution and charitable activities</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Events, Calendar, Trustees sections remain the same but truncated here for brevity */}
+                        {/* The full implementation continues with all sections... */}
+                                                {/* Events Section */}
+                        {activeSection === 'events' && (
+                            <div className="space-y-6">
+                                {/* Upcoming Events */}
+                                <div className="bg-white rounded-xl shadow-lg p-6">
+                                    <h2 className="text-3xl font-bold text-gray-800 mb-6 border-b-2 border-orange-500 pb-2">
+                                        Upcoming Events
+                                    </h2>
+                                    <div className="space-y-4">
+                                        {getUpcomingEvents().length > 0 ? (
+                                            getUpcomingEvents().map((event, idx) => (
+                                                <div key={idx} className="border border-orange-200 rounded-lg p-6 hover:shadow-md transition-shadow">
+                                                    <div className="flex flex-col md:flex-row md:items-start md:space-x-4">
+                                                        <div className="flex-shrink-0 mb-4 md:mb-0">
+                                                            <div className="w-20 h-20 bg-gradient-to-br from-orange-500 to-red-500 text-white rounded-lg flex flex-col items-center justify-center shadow-lg">
+                                                                <div className="text-sm">{formatDate(event.Date).split(' ')[1]?.substring(0, 3)}</div>
+                                                                <div className="text-3xl font-bold">{formatDate(event.Date).split(' ')[0]}</div>
+                                                                <div className="text-xs">{formatDate(event.Date).split(' ')[2]}</div>
+                                                            </div>
+                                                        </div>
+                                                        <div className="flex-1">
+                                                            <h3 className="text-xl font-semibold text-gray-800 mb-2">{event.Activity}</h3>
+                                                            <p className="text-gray-600 flex items-start mb-2">
+                                                                <MapPin size={16} className="mr-2 mt-1 flex-shrink-0 text-orange-600" />
+                                                                <span>{event.Venue}</span>
+                                                            </p>
+                                                            <span className="inline-block bg-orange-100 text-orange-800 text-xs px-3 py-1 rounded-full">
+                                                                {event.Type}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <p className="text-gray-500 text-center py-8">No upcoming events scheduled at the moment.</p>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Past Events */}
+                                <div className="bg-white rounded-xl shadow-lg p-6">
+                                    <h2 className="text-3xl font-bold text-gray-800 mb-6 border-b-2 border-orange-500 pb-2">
+                                        Past Events
+                                    </h2>
+                                    <div className="overflow-x-auto">
+                                        <table className="w-full">
+                                            <thead className="bg-orange-50">
+                                                <tr>
+                                                    <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Date</th>
+                                                    <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Event</th>
+                                                    <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Venue</th>
+                                                    <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Media</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="divide-y divide-gray-200">
+                                                {getPastEvents().map((event, idx) => {
+                                                    const mediaLinks = parseMediaLinks(event.MediaFolder);
+                                                    return (
+                                                        <tr key={idx} className="hover:bg-orange-50 transition-colors">
+                                                            <td className="px-4 py-3 text-sm text-gray-600 whitespace-nowrap">
+                                                                {formatDate(event.Date)}
+                                                            </td>
+                                                            <td className="px-4 py-3 text-sm text-gray-800">{event.Activity}</td>
+                                                            <td className="px-4 py-3 text-sm text-gray-600">{event.Venue}</td>
+                                                            <td className="px-4 py-3 text-sm">
+                                                                <div className="flex space-x-2">
+                                                                    {mediaLinks.map((link, linkIdx) => (
+                                                                        <a
+                                                                            key={linkIdx}
+                                                                            href={link.url}
+                                                                            target="_blank"
+                                                                            rel="noopener noreferrer"
+                                                                            className="text-orange-600 hover:text-orange-800"
+                                                                            title={link.type === 'YT' ? 'YouTube' : link.type === 'GP' ? 'Google Photos' : link.type === 'IR' ? 'Instagram' : 'Link'}
+                                                                        >
+                                                                            {link.type === 'YT' ? <Youtube size={18} /> : <ExternalLink size={18} />}
+                                                                        </a>
+                                                                    ))}
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    );
+                                                })}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                {/* Recurring Events */}
+                                <div className="bg-white rounded-xl shadow-lg p-6">
+                                    <h2 className="text-3xl font-bold text-gray-800 mb-6 border-b-2 border-orange-500 pb-2">
+                                        Regular Events
+                                    </h2>
+                                    <div className="grid md:grid-cols-2 gap-4">
+                                        {events.filter(e => e.Date && e.Date.startsWith('Every')).map((event, idx) => (
+                                            <div key={idx} className="bg-gradient-to-r from-orange-50 to-red-50 p-6 rounded-lg border-l-4 border-orange-600">
+                                                <h3 className="font-semibold text-gray-800 mb-2">{event.Date}</h3>
+                                                <p className="text-gray-700 mb-2">{event.Activity}</p>
+                                                <p className="text-sm text-gray-600 flex items-center">
+                                                    <MapPin size={14} className="mr-1" />
+                                                    {event.Venue}
+                                                </p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                                                {/* Calendar Section */}
+                        {activeSection === 'calendar' && (
+                            <div className="bg-white rounded-xl shadow-lg p-6">
+                                <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                                    <h2 className="text-3xl font-bold text-gray-800">
+                                        Monthly Pooja Calendar 2026
+                                    </h2>
+                                    <div className="flex items-center space-x-4">
+                                        <button
+                                            onClick={() => {
+                                                const today = new Date();
+                                                const newMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1);
+                                                // Don't allow going to months before current month
+                                                if (newMonth.getFullYear() > today.getFullYear() || 
+                                                    (newMonth.getFullYear() === today.getFullYear() && newMonth.getMonth() >= today.getMonth())) {
+                                                    setCurrentMonth(newMonth);
+                                                }
+                                            }}
+                                            className={`p-2 rounded-lg ${
+                                                (() => {
+                                                    const today = new Date();
+                                                    const prevMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1);
+                                                    const canGoPrev = prevMonth.getFullYear() > today.getFullYear() || 
+                                                        (prevMonth.getFullYear() === today.getFullYear() && prevMonth.getMonth() >= today.getMonth());
+                                                    return canGoPrev ? 'bg-orange-100 hover:bg-orange-200 cursor-pointer' : 'bg-gray-100 cursor-not-allowed opacity-50';
+                                                })()
+                                            }`}
+                                            disabled={(() => {
+                                                const today = new Date();
+                                                const prevMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1);
+                                                return !(prevMonth.getFullYear() > today.getFullYear() || 
+                                                    (prevMonth.getFullYear() === today.getFullYear() && prevMonth.getMonth() >= today.getMonth()));
+                                            })()}
+                                        >
+                                            <ChevronLeft className="text-orange-600" />
+                                        </button>
+                                        <span className="text-xl font-semibold text-gray-700 min-w-[200px] text-center">
+                                            {currentMonth.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' })}
+                                        </span>
+                                        <button
+                                            onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1))}
+                                            className="p-2 bg-orange-100 hover:bg-orange-200 rounded-lg"
+                                        >
+                                            <ChevronRight className="text-orange-600" />
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-7 gap-0 border border-gray-300 rounded-lg overflow-hidden">
+                                    {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+                                        <div key={day} className="bg-orange-600 text-white text-center py-3 font-semibold border-r border-white last:border-r-0">
+                                            {day}
+                                        </div>
+                                    ))}
+                                    {(() => {
+                                        const year = currentMonth.getFullYear();
+                                        const month = currentMonth.getMonth();
+                                        const firstDay = new Date(year, month, 1);
+                                        const lastDay = new Date(year, month + 1, 0);
+                                        const daysInMonth = lastDay.getDate();
+                                        const startingDayOfWeek = firstDay.getDay();
+                                        const today = new Date();
+                                        today.setHours(0, 0, 0, 0);
+                                        
+                                        const monthEvents = monthlyEvents.filter(event => {
+                                            const eventDate = new Date(event.Date);
+                                            return eventDate.getFullYear() === year && eventDate.getMonth() === month;
+                                        });
+                                        
+                                        const days = [];
+                                        
+                                        // Empty cells before month starts
+                                        for (let i = 0; i < startingDayOfWeek; i++) {
+                                            days.push(<div key={`empty-${i}`} className="h-24 border border-gray-200 bg-gray-50"></div>);
+                                        }
+                                        
+                                        // Days of the month
+                                        for (let day = 1; day <= daysInMonth; day++) {
+                                            const currentDate = new Date(year, month, day);
+                                            currentDate.setHours(0, 0, 0, 0);
+                                            const isPast = currentDate < today;
+                                            const eventOnDay = monthEvents.find(e => new Date(e.Date).getDate() === day);
+                                            const hasEvent = eventOnDay && !isPast; // Only show if not in past
+                                            
+                                            days.push(
+                                                <div key={day} className={`h-24 border border-gray-200 p-2 ${isPast ? 'bg-gray-100' : hasEvent ? 'bg-orange-50' : ''}`}>
+                                                    <div className={`font-semibold ${isPast ? 'text-gray-400' : 'text-gray-700'}`}>{day}</div>
+                                                    {hasEvent && (
+                                                        <div className="mt-2 flex flex-col items-center justify-center">
+                                                            <img 
+                                                                src={`images/${eventOnDay.Occasion.toLowerCase() === 'pradosham' ? 'pradosham.png' : 'sankataharachathurthi.png'}`}
+                                                                alt={eventOnDay.Occasion}
+                                                                className="w-8 h-8 object-contain"
+                                                                onError={(e) => {
+                                                                    e.target.style.display = 'none';
+                                                                    e.target.nextSibling.style.display = 'block';
+                                                                }}
+                                                            />
+                                                            <span className="text-xs text-orange-600 mt-1 font-medium" style={{display: 'none'}}>
+                                                                {eventOnDay.Occasion}
+                                                            </span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            );
+                                        }
+                                        
+                                        return days;
+                                    })()}
+                                </div>
+
+                                <div className="mt-6 bg-orange-50 p-4 rounded-lg">
+                                    <h3 className="font-semibold text-gray-800 mb-3">Legend:</h3>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div className="flex items-center space-x-3">
+                                            <img 
+                                                src="images/pradosham.png" 
+                                                alt="Pradosham" 
+                                                className="w-10 h-10 object-contain"
+                                                onError={(e) => {
+                                                    e.target.style.display = 'none';
+                                                    e.target.nextSibling.style.display = 'block';
+                                                }}
+                                            />
+                                            <div style={{display: 'none'}} className="w-10 h-10 bg-orange-200 rounded flex items-center justify-center text-xs">P</div>
+                                            <div>
+                                                <p className="text-sm font-medium text-gray-800">Pradosham</p>
+                                                <p className="text-xs text-gray-600">Monthly Pradosham pooja with Vedic chanting</p>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center space-x-3">
+                                            <img 
+                                                src="images/sankataharachathurthi.png" 
+                                                alt="Sankatahara Chaturthi" 
+                                                className="w-10 h-10 object-contain"
+                                                onError={(e) => {
+                                                    e.target.style.display = 'none';
+                                                    e.target.nextSibling.style.display = 'block';
+                                                }}
+                                            />
+                                            <div style={{display: 'none'}} className="w-10 h-10 bg-red-200 rounded flex items-center justify-center text-xs">SC</div>
+                                            <div>
+                                                <p className="text-sm font-medium text-gray-800">Sankatahara Chaturthi</p>
+                                                <p className="text-xs text-gray-600">Monthly Sankatahara Chathurthi pooja</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="mt-3 pt-3 border-t border-orange-200">
+                                        <p className="text-xs text-gray-600">
+                                            <span className="inline-block w-4 h-4 bg-gray-100 border border-gray-300 mr-2"></span>
+                                            Past dates are grayed out and do not show pooja icons
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        )}                      
+                        {/* Trustees Section */}
+                        {activeSection === 'trustees' && (
+                            <div className="bg-white rounded-xl shadow-lg p-6">
+                                <h2 className="text-3xl font-bold text-gray-800 mb-6 border-b-2 border-orange-500 pb-2">
+                                    Our Trustees
+                                </h2>
+
+                                {/* Management Team */}
+                                <div className="mb-8">
+                                    <h3 className="text-2xl font-semibold text-gray-800 mb-4">Management Team</h3>
+                                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                        {trustees.filter(t => t.Category === 'Management').map((trustee, idx) => (
+                                            <div key={idx} className="bg-gradient-to-br from-orange-50 to-red-50 p-6 rounded-lg border-l-4 border-orange-600 hover:shadow-md transition-shadow">
+                                                <h4 className="font-semibold text-gray-800 text-lg">{trustee.Name}</h4>
+                                                <p className="text-orange-600 font-medium mt-1">{trustee.Role}</p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* General Trustees */}
+                                <div className="mb-8">
+                                    <h3 className="text-2xl font-semibold text-gray-800 mb-4">General Trustees</h3>
+                                    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+                                        {trustees.filter(t => t.Category === 'General').map((trustee, idx) => (
+                                            <div key={idx} className="bg-orange-50 p-4 rounded-lg border border-orange-200 hover:shadow-md transition-shadow">
+                                                <h4 className="font-semibold text-gray-800">{trustee.Name}</h4>
+                                                <p className="text-sm text-gray-600 mt-1">{trustee.Role}</p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Advisor */}
+                                {trustees.filter(t => t.Category === 'Advisor').length > 0 && (
+                                    <div>
+                                        <h3 className="text-2xl font-semibold text-gray-800 mb-4">Advisor</h3>
+                                        <div className="grid md:grid-cols-2 gap-4">
+                                            {trustees.filter(t => t.Category === 'Advisor').map((trustee, idx) => (
+                                                <div key={idx} className="bg-gradient-to-br from-orange-50 to-red-50 p-6 rounded-lg border-l-4 border-orange-600 hover:shadow-md transition-shadow">
+                                                    <h4 className="font-semibold text-gray-800 text-lg">{trustee.Name}</h4>
+                                                    <p className="text-orange-600 font-medium mt-1">{trustee.Role}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                                            {/* Donation Section */}
+                        {activeSection === 'donation' && (
+                            <div className="bg-white rounded-xl shadow-lg p-8">
+                                <h2 className="text-3xl font-bold text-gray-800 mb-6 border-b-2 border-orange-500 pb-2">
+                                    Support Our Cause
+                                </h2>
+                                
+                                <div className="mb-8">
+                                    <p className="text-lg text-gray-700 mb-4 leading-relaxed">
+                                        Your generous donations help us continue our mission of spreading the values of Sanathana Dharma through regular poojas, bhajans, and charitable activities like Annadhanam.
+                                    </p>
+                                    
+                                    <div className="grid md:grid-cols-2 gap-6 mb-6">
+                                        {/* Bank Details */}
+                                        <div className="bg-orange-50 p-6 rounded-lg border-l-4 border-orange-600">
+                                            <h3 className="text-xl font-semibold text-gray-800 mb-3">Bank Details</h3>
+                                            <div className="space-y-2 text-gray-700">
+                                                <p><strong>Account Name:</strong> Dharma Paripalana Samithi</p>
+                                                <p><strong>Account Number:</strong> 500101013016821</p>
+                                                <p><strong>Bank Name:</strong> City Union Bank</p>
+                                                <p><strong>IFSC Code:</strong> CIUB0000336</p>
+                                                <p><strong>Branch:</strong> Guduvanchery</p>
+                                                <p><strong>UPI Id:</strong> EZE0098780@CUB</p>
+                                            </div>
+                                            <p className="text-sm text-gray-600 mt-4 italic">
+                                                * Donations are eligible for tax exemption under Section 80G
+                                            </p>
+                                        </div>
+                                        
+                                        {/* QR Code */}
+                                        <div className="bg-gradient-to-br from-orange-50 to-red-50 p-6 rounded-lg border-l-4 border-red-600 flex flex-col items-center justify-center">
+                                            <h3 className="text-xl font-semibold text-gray-800 mb-3">Scan to Donate</h3>
+                                            <div className="bg-white p-4 rounded-lg shadow-md">
+                                                <img 
+                                                    src="images/qr-code.png" 
+                                                    alt="UPI QR Code for Donations"
+                                                    className="w-48 h-48 object-contain"
+                                                    onError={(e) => {
+                                                        e.target.style.display = 'none';
+                                                        e.target.nextElementSibling.style.display = 'flex';
+                                                    }}
+                                                />
+                                                <div style={{display: 'none'}} className="w-48 h-48 bg-gray-200 rounded flex items-center justify-center flex-col p-4">
+                                                    <p className="text-gray-600 text-center text-sm">QR Code</p>
+                                                    <p className="text-gray-500 text-xs text-center mt-2">(Place qrcode.png in images/ folder)</p>
+                                                </div>
+                                            </div>
+                                            <p className="text-sm text-gray-600 mt-3 text-center">
+                                                Use any UPI app to scan and donate
+                                            </p>
+                                            {/*
+                                            <div className="flex gap-2 mt-2">
+                                                <span className="text-xs bg-white px-2 py-1 rounded border border-gray-300">GPay</span>
+                                                <span className="text-xs bg-white px-2 py-1 rounded border border-gray-300">PhonePe</span>
+                                                <span className="text-xs bg-white px-2 py-1 rounded border border-gray-300">Paytm</span>
+                                            </div>*/}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="bg-gray-50 p-6 rounded-lg">
+                                    <h3 className="text-xl font-semibold text-gray-800 mb-4">Donation Receipt Request</h3>
+                                    <p className="text-sm text-gray-600 mb-4">
+                                        If you've made a donation and would like to receive an 80G receipt, please fill out this form. 
+                                        <strong className="text-orange-600"> All information is encrypted and stored securely.</strong>
+                                    </p>
+                                    
+                                    <form className="space-y-4" onSubmit={(e) => {
+                                        e.preventDefault();
+                                        const formData = new FormData(e.target);
+                                        const data = Object.fromEntries(formData);
+                                        
+                                        // Basic validation
+                                        if (!data.name || !data.email || !data.amount) {
+                                            alert('Please fill in all required fields.');
+                                            return;
+                                        }
+                                        
+                                        // Email validation
+                                        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                                        if (!emailRegex.test(data.email)) {
+                                            alert('Please enter a valid email address.');
+                                            return;
+                                        }
+                                        
+                                        // Phone validation (10 digits)
+                                        if (data.phone && !/^\d{10}$/.test(data.phone)) {
+                                            alert('Please enter a valid 10-digit mobile number.');
+                                            return;
+                                        }
+                                        
+                                        // Estancia flat number validation
+                                        if (data.isResident === 'yes' && data.flatNumber) {
+                                            const flat = data.flatNumber;
+                                            if (!/^\d{4}$/.test(flat)) {
+                                                alert('Flat number must be exactly 4 digits.');
+                                                return;
+                                            }
+                                            const tower = parseInt(flat[0]);
+                                            const floor = parseInt(flat.substring(1, 3));
+                                            const unit = parseInt(flat[3]);
+                                            
+                                            if (tower < 1 || tower > 5) {
+                                                alert('Invalid flat number: Tower number (first digit) must be between 1 and 5.');
+                                                return;
+                                            }
+                                            if (floor < 1 || floor > 17) {
+                                                alert('Invalid flat number: Floor number (2nd and 3rd digits) must be between 01 and 17.');
+                                                return;
+                                            }
+                                            if (unit < 1 || unit > 8) {
+                                                alert('Invalid flat number: Unit number (last digit) must be between 1 and 8.');
+                                                return;
+                                            }
+                                        }
+                                        
+                                        // PAN validation (5 letters + 4 digits + 1 letter)
+                                        if (data.pan) {
+                                            const panUpper = data.pan.toUpperCase();
+                                            if (!/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(panUpper)) {
+                                                alert('Invalid PAN format. It should be: 5 letters, 4 digits, 1 letter (e.g., ABCDE1234F).');
+                                                return;
+                                            }
+                                        }
+                                        
+                                        alert('Thank you! Your donation receipt request has been submitted. We will send you the 80G certificate via email within 3-5 business days.\n\nNote: This is a demo form. In production, this would be sent to your backend server.');
+                                        e.target.reset();
+                                    }}>
+                                        
+                                        {/* Resident Status */}
+                                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                Are you an Estancia resident? <span className="text-red-500">*</span>
+                                            </label>
+                                            <div className="flex gap-4">
+                                                <label className="flex items-center">
+                                                    <input
+                                                        type="radio"
+                                                        name="isResident"
+                                                        value="yes"
+                                                        className="mr-2"
+                                                        onChange={(e) => {
+                                                            const flatField = document.getElementById('flatNumberField');
+                                                            if (flatField) {
+                                                                flatField.style.display = e.target.checked ? 'block' : 'none';
+                                                            }
+                                                        }}
+                                                    />
+                                                    Yes, I'm a resident
+                                                </label>
+                                                <label className="flex items-center">
+                                                    <input
+                                                        type="radio"
+                                                        name="isResident"
+                                                        value="no"
+                                                        defaultChecked
+                                                        className="mr-2"
+                                                        onChange={(e) => {
+                                                            const flatField = document.getElementById('flatNumberField');
+                                                            if (flatField) {
+                                                                flatField.style.display = e.target.checked ? 'none' : 'none';
+                                                            }
+                                                        }}
+                                                    />
+                                                    No
+                                                </label>
+                                            </div>
+                                        </div>
+                                        
+                                        {/* Flat Number Field - Hidden by default */}
+                                        <div id="flatNumberField" style={{display: 'none'}}>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                Estancia Flat Number <span className="text-red-500">*</span>
+                                            </label>
+                                            <input
+                                                type="text"
+                                                name="flatNumber"
+                                                pattern="\d{4}"
+                                                maxLength="4"
+                                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                                                placeholder="Enter 4-digit flat number (e.g., 5137)"
+                                            />
+                                            <p className="text-xs text-gray-500 mt-1">
+                                                Format: Tower (1-5), Floor (01-17), Unit (1-8). Example: 5137 = Tower 5, Floor 13, Unit 7
+                                            </p>
+                                        </div>
+                                        
+                                        <div className="grid md:grid-cols-2 gap-4">
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                    Full Name <span className="text-red-500">*</span>
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    name="name"
+                                                    required
+                                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                                                    placeholder="Enter your full name"
+                                                    autoComplete="name"
+                                                />
+                                            </div>
+                                            
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                    Email Address <span className="text-red-500">*</span>
+                                                </label>
+                                                <input
+                                                    type="email"
+                                                    name="email"
+                                                    required
+                                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                                                    placeholder="your.email@example.com"
+                                                    autoComplete="email"
+                                                />
+                                            </div>
+                                            
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                    Mobile Number <span className="text-red-500">*</span>
+                                                </label>
+                                                <input
+                                                    type="tel"
+                                                    name="phone"
+                                                    required
+                                                    pattern="[0-9]{10}"
+                                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                                                    placeholder="10-digit mobile number"
+                                                    autoComplete="tel"
+                                                    maxLength="10"
+                                                />
+                                                <p className="text-xs text-gray-500 mt-1">For receipt delivery updates only</p>
+                                            </div>
+                                            
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                    PAN Number <span className="text-gray-500">(Optional for 80G)</span>
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    name="pan"
+                                                    pattern="[A-Za-z]{5}[0-9]{4}[A-Za-z]{1}"
+                                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent uppercase"
+                                                    placeholder="ABCDE1234F"
+                                                    maxLength="10"
+                                                    onInput={(e) => e.target.value = e.target.value.toUpperCase()}
+                                                />
+                                                <p className="text-xs text-gray-500 mt-1">
+                                                    Format: 5 letters + 4 digits + 1 letter (e.g., ABCDE1234F)
+                                                </p>
+                                            </div>
+                                            
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                    Donation Amount (₹) <span className="text-red-500">*</span>
+                                                </label>
+                                                <input
+                                                    type="number"
+                                                    name="amount"
+                                                    required
+                                                    min="1"
+                                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                                                    placeholder="Enter amount"
+                                                />
+                                            </div>
+                                            
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                    Transaction Date <span className="text-red-500">*</span>
+                                                </label>
+                                                <input
+                                                    type="date"
+                                                    name="date"
+                                                    required
+                                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                                                />
+                                            </div>
+                                        </div>
+                                        
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                Transaction Reference / UTR Number
+                                            </label>
+                                            <input
+                                                type="text"
+                                                name="reference"
+                                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                                                placeholder="Transaction ID or UTR number"
+                                            />
+                                        </div>
+                                        
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                Address (for 80G Certificate)
+                                            </label>
+                                            <textarea
+                                                name="address"
+                                                rows="3"
+                                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                                                placeholder="Your complete address"
+                                            ></textarea>
+                                        </div>
+                                        
+                                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                            <div className="flex items-start">
+                                                <input
+                                                    type="checkbox"
+                                                    name="privacy"
+                                                    required
+                                                    className="mt-1 mr-3"
+                                                    id="privacy-donation"
+                                                />
+                                                <label htmlFor="privacy-donation" className="text-sm text-gray-700">
+                                                    I consent to Dharma Paripalana Samithi collecting and processing my personal information 
+                                                    (including mobile number, PAN, and flat number) for the purpose of issuing donation receipts 
+                                                    and tax certificates. I understand that my data will be encrypted, stored securely, and not 
+                                                    shared with third parties. <span className="text-red-500">*</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        
+                                        <button
+                                            type="submit"
+                                            className="w-full bg-gradient-to-r from-orange-600 to-red-600 text-white py-3 px-6 rounded-lg hover:from-orange-700 hover:to-red-700 transition-all font-semibold shadow-lg"
+                                        >
+                                            Submit Receipt Request
+                                        </button>
+                                        
+                                        <p className="text-xs text-gray-500 text-center mt-2">
+                                            🔒 Your information is encrypted and securely stored
+                                        </p>
+                                    </form>
+                                </div>
+                            </div>
+                        )}
+                        {/* Contact Section */}
+                        {activeSection === 'contact' && (
+                            <div className="bg-white rounded-xl shadow-lg p-8">
+                                <h2 className="text-3xl font-bold text-gray-800 mb-6 border-b-2 border-orange-500 pb-2">
+                                    Contact Us
+                                </h2>
+                                
+                                <div className="grid md:grid-cols-2 gap-8 mb-8">
+                                    <div>
+                                        <h3 className="text-xl font-semibold text-gray-800 mb-4">Get in Touch</h3>
+                                        <p className="text-gray-700 mb-6">
+                                            Have questions about our events, want to volunteer, or need more information? 
+                                            We'd love to hear from you!
+                                        </p>
+                                        
+                                        <div className="space-y-4">
+                                            <div className="flex items-start">
+                                                <MapPinIcon size={20} className="text-orange-600 mr-3 mt-1" />
+                                                <div>
+                                                    <h4 className="font-semibold text-gray-800">Address</h4>
+                                                    <p className="text-gray-600 text-sm">
+                                                        #5137 Estancia, Tower #5<br />
+                                                        GST Road, Vallanchery<br />
+                                                        Guduvanchery PO<br />
+                                                        Tamil Nadu - 603202
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            
+                                            <div className="flex items-start">
+                                                <Phone size={20} className="text-orange-600 mr-3 mt-1" />
+                                                <div>
+                                                    <h4 className="font-semibold text-gray-800">Phone</h4>
+                                                    <p className="text-gray-600 text-sm">
+                                                        <span>+91-98407</span>
+                                                        <span style={{unicodeBidi: 'bidi-override', direction: 'rtl'}}>45081</span>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            
+                                            <div className="flex items-start">
+                                                <Mail size={20} className="text-orange-600 mr-3 mt-1" />
+                                                <div>
+                                                    <h4 className="font-semibold text-gray-800">Email</h4>
+                                                    <a href="mailto:dps.info@zohomail.in" className="text-orange-600 hover:text-orange-700 text-sm">
+                                                        dps.info@zohomail.in
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="bg-gray-50 p-6 rounded-lg">
+                                        <h3 className="text-xl font-semibold text-gray-800 mb-4">Send us a Message</h3>
+                                        
+                                        <form className="space-y-4" onSubmit={(e) => {
+                                            e.preventDefault();
+                                            const formData = new FormData(e.target);
+                                            const data = Object.fromEntries(formData);
+                                            
+                                            // Basic validation
+                                            if (!data.name || !data.email || !data.message) {
+                                                alert('Please fill in all required fields.');
+                                                return;
+                                            }
+                                            
+                                            // Email validation
+                                            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                                            if (!emailRegex.test(data.email)) {
+                                                alert('Please enter a valid email address.');
+                                                return;
+                                            }
+                                            
+                                            // Phone validation if provided
+                                            if (data.phone && !/^\d{10}$/.test(data.phone)) {
+                                                alert('Please enter a valid 10-digit mobile number.');
+                                                return;
+                                            }
+                                            
+                                            // Estancia flat number validation if resident
+                                            if (data.isResident === 'yes' && data.flatNumber) {
+                                                const flat = data.flatNumber;
+                                                if (!/^\d{4}$/.test(flat)) {
+                                                    alert('Flat number must be exactly 4 digits.');
+                                                    return;
+                                                }
+                                                const tower = parseInt(flat[0]);
+                                                const floor = parseInt(flat.substring(1, 3));
+                                                const unit = parseInt(flat[3]);
+                                                
+                                                if (tower < 1 || tower > 5) {
+                                                    alert('Invalid flat number: Tower number (first digit) must be between 1 and 5.');
+                                                    return;
+                                                }
+                                                if (floor < 1 || floor > 17) {
+                                                    alert('Invalid flat number: Floor number (2nd and 3rd digits) must be between 01 and 17.');
+                                                    return;
+                                                }
+                                                if (unit < 1 || unit > 8) {
+                                                    alert('Invalid flat number: Unit number (last digit) must be between 1 and 8.');
+                                                    return;
+                                                }
+                                            }
+                                            
+                                            alert('Thank you for contacting us! We will get back to you within 24-48 hours.\n\nNote: This is a demo form. In production, this would be sent to your backend server.');
+                                            e.target.reset();
+                                        }}>
+                                            
+                                            {/* Resident Status */}
+                                            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                    Are you an Estancia resident?
+                                                </label>
+                                                <div className="flex gap-4">
+                                                    <label className="flex items-center">
+                                                        <input
+                                                            type="radio"
+                                                            name="isResident"
+                                                            value="yes"
+                                                            className="mr-2"
+                                                            onChange={(e) => {
+                                                                const flatField = document.getElementById('contactFlatNumberField');
+                                                                if (flatField) {
+                                                                    flatField.style.display = e.target.checked ? 'block' : 'none';
+                                                                }
+                                                            }}
+                                                        />
+                                                        Yes, I'm a resident
+                                                    </label>
+                                                    <label className="flex items-center">
+                                                        <input
+                                                            type="radio"
+                                                            name="isResident"
+                                                            value="no"
+                                                            defaultChecked
+                                                            className="mr-2"
+                                                            onChange={(e) => {
+                                                                const flatField = document.getElementById('contactFlatNumberField');
+                                                                if (flatField) {
+                                                                    flatField.style.display = 'none';
+                                                                }
+                                                            }}
+                                                        />
+                                                        No
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            
+                                            {/* Flat Number Field - Hidden by default */}
+                                            <div id="contactFlatNumberField" style={{display: 'none'}}>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                    Estancia Flat Number
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    name="flatNumber"
+                                                    pattern="\d{4}"
+                                                    maxLength="4"
+                                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                                                    placeholder="Enter 4-digit flat number (e.g., 5137)"
+                                                />
+                                                <p className="text-xs text-gray-500 mt-1">
+                                                    Format: Tower (1-5), Floor (01-17), Unit (1-8)
+                                                </p>
+                                            </div>
+                                            
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                    Your Name <span className="text-red-500">*</span>
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    name="name"
+                                                    required
+                                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                                                    placeholder="Enter your name"
+                                                    autoComplete="name"
+                                                />
+                                            </div>
+                                            
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                    Email Address <span className="text-red-500">*</span>
+                                                </label>
+                                                <input
+                                                    type="email"
+                                                    name="email"
+                                                    required
+                                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                                                    placeholder="your.email@example.com"
+                                                    autoComplete="email"
+                                                />
+                                            </div>
+                                            
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                    Phone Number <span className="text-gray-500">(Optional)</span>
+                                                </label>
+                                                <input
+                                                    type="tel"
+                                                    name="phone"
+                                                    pattern="[0-9]{10}"
+                                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                                                    placeholder="10-digit mobile number"
+                                                    autoComplete="tel"
+                                                    maxLength="10"
+                                                />
+                                            </div>
+                                            
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                    Subject
+                                                </label>
+                                                <select
+                                                    name="subject"
+                                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                                                >
+                                                    <option value="general">General Inquiry</option>
+                                                    <option value="events">Event Information</option>
+                                                    <option value="volunteer">Volunteer Opportunity</option>
+                                                    <option value="donation">Donation Inquiry</option>
+                                                    <option value="membership">Membership</option>
+                                                    <option value="feedback">Feedback</option>
+                                                    <option value="other">Other</option>
+                                                </select>
+                                            </div>
+                                            
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                    Message <span className="text-red-500">*</span>
+                                                </label>
+                                                <textarea
+                                                    name="message"
+                                                    required
+                                                    rows="4"
+                                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                                                    placeholder="Type your message here..."
+                                                ></textarea>
+                                            </div>
+                                            
+                                            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                                <div className="flex items-start">
+                                                    <input
+                                                        type="checkbox"
+                                                        name="privacy"
+                                                        required
+                                                        className="mt-1 mr-3"
+                                                        id="privacy-contact"
+                                                    />
+                                                    <label htmlFor="privacy-contact" className="text-sm text-gray-700">
+                                                        I consent to Dharma Paripalana Samithi using my contact information to respond to 
+                                                        my inquiry. My data will not be shared with third parties. <span className="text-red-500">*</span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            
+                                            <button
+                                                type="submit"
+                                                className="w-full bg-gradient-to-r from-orange-600 to-red-600 text-white py-3 px-6 rounded-lg hover:from-orange-700 hover:to-red-700 transition-all font-semibold shadow-lg"
+                                            >
+                                                Send Message
+                                            </button>
+                                            
+                                            <p className="text-xs text-gray-500 text-center mt-2">
+                                                🔒 Your information is secure and will only be used to respond to your inquiry
+                                            </p>
+                                        </form>
+                                    </div>
+                                </div>
+                                
+                                <div className="bg-orange-50 border-l-4 border-orange-600 p-6 rounded-lg">
+                                    <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                                        Privacy & Data Protection
+                                    </h3>
+                                    <ul className="text-sm text-gray-700 space-y-2">
+                                        <li>✓ All personal information is encrypted using industry-standard SSL/TLS protocols</li>
+                                        <li>✓ Mobile numbers, PAN details, and flat numbers are stored securely and never displayed publicly</li>
+                                        <li>✓ Data is used solely for the stated purpose (receipt generation or responding to inquiries)</li>
+                                        <li>✓ We never share your personal information with third parties</li>
+                                        <li>✓ You can request deletion of your data at any time by contacting us</li>
+                                        <li>✓ We comply with Indian data protection regulations and best practices</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        )}
+                    </main>
+
+                    {/* Footer */}
+                    <footer className="bg-gradient-to-r from-orange-600 to-red-600 text-white mt-12 py-8">
+                        <div className="max-w-7xl mx-auto px-4">
+                            <div className="text-center mb-6">
+                                <p className="text-2xl font-semibold mb-2">🕉️ धर्मो रक्षति रक्षितः 🕉️</p>
+                                <p className="text-orange-100 text-lg">Dharma Paripalana Samithi, Estancia</p>
+                                <p className="text-sm text-orange-200 mt-2">Spreading the values of Sanathana Dharma since 2021</p>
+                            </div>
+                            
+                            <div className="border-t border-orange-400 pt-6 mt-6">
+                                <div className="grid md:grid-cols-3 gap-6">
+                                    <div>
+                                        <h4 className="font-semibold text-orange-100 mb-3 flex items-center">
+                                            <MapPinIcon size={18} className="mr-2" />
+                                            Address
+                                        </h4>
+                                        <p className="text-sm text-orange-200 leading-relaxed">
+                                            #5137 Estancia, Tower #5<br />
+                                            GST Road, Vallanchery<br />
+                                            Guduvanchery PO<br />
+                                            Tamil Nadu - 603202
+                                        </p>
+                                    </div>
+                                    
+                                    <div>
+                                        <h4 className="font-semibold text-orange-100 mb-3">Contact Us</h4>
+                                        <div className="space-y-2">
+                                            <p className="text-sm text-orange-200 flex items-start">
+                                                <Phone size={16} className="mr-2 mt-0.5 flex-shrink-0" />
+                                                <span>
+                                                    <span data-phone="hidden">+91-98407</span>
+                                                    <span style={{unicodeBidi: 'bidi-override', direction: 'rtl'}}>45081</span>
+                                                </span>
+                                            </p>
+                                            <p className="text-sm text-orange-200 flex items-start">
+                                                <Mail size={16} className="mr-2 mt-0.5 flex-shrink-0" />
+                                                <a href="mailto:dps.info@zohomail.in" className="hover:text-white underline break-all">
+                                                    dps.info@zohomail.in
+                                                </a>
+                                            </p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div>
+                                        <h4 className="font-semibold text-orange-100 mb-3">Quick Links</h4>
+                                        <div className="space-y-2">
+                                            <button onClick={() => { setActiveSection('about'); window.scrollTo(0, 0); }} className="block text-sm text-orange-200 hover:text-white transition-colors">→ About Us</button>
+                                            <button onClick={() => { setActiveSection('events'); window.scrollTo(0, 0); }} className="block text-sm text-orange-200 hover:text-white transition-colors">→ Events</button>
+                                            <button onClick={() => { setActiveSection('calendar'); window.scrollTo(0, 0); }} className="block text-sm text-orange-200 hover:text-white transition-colors">→ Calendar 2026</button>
+                                            <button onClick={() => { setActiveSection('trustees'); window.scrollTo(0, 0); }} className="block text-sm text-orange-200 hover:text-white transition-colors">→ Trustees</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div className="text-center mt-6 pt-6 border-t border-orange-400">
+                                <p className="text-xs text-orange-200">© 2026 Dharma Paripalana Samithi, Estancia. All rights reserved.</p>
+                            </div>
+                        </div>
+                    </footer>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<DharmaParipalanaSamithi />);
+    </script>
+</body>
+</html>
