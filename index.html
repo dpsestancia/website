@@ -1043,7 +1043,9 @@ async function updateSidebar(calendarRows) {
                     ${item.date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })} : &nbsp;
                 </strong>
             ${(item.name.toLowerCase().includes("sankatahara")) ? `<img src="images/sankataharachathurthi.png" style="width:18px; vertical-align:middle;">`
-            : `<img src="images/pradosham.png" style="width:18px; vertical-align:middle;">`}${item.name}
+            : (item.name.toLowerCase().includes("pradosham")) ? `<img src="images/pradosham.png" style="width:18px; vertical-align:middle;">`   
+            : (item.name.toLowerCase().includes("sashti") || item.name.toLowerCase().includes("karthigai")) ? `<img src="images/muruga.png" style="width:18px; vertical-align:middle;">` : ''
+            }
             </li>
         `).join('') || "<li>Dates coming soon</li>";
     } catch (e) { console.error("Error loading monthly calendar", e); }
