@@ -699,7 +699,13 @@
                                                     {hasEvent && (
                                                         <div className="mt-2 flex flex-col items-center justify-center">
                                                             <img 
-                                                                src={`images/${eventOnDay.Occasion.toLowerCase() === 'pradosham' ? 'pradosham.png' : 'sankataharachathurthi.png'}`}
+                                                                // src={`images/${eventOnDay.Occasion.toLowerCase() === 'pradosham' ? 'pradosham.png' : 'sankataharachathurthi.png'}`}
+                                                                src={
+                                                                    eventOnDay.Occasion.toLowerCase().includes('pradosham') ? 'images/pradosham.png' : 
+                                                                    eventOnDay.Occasion.toLowerCase().includes('sankatahara') ? 'images/sankataharachathurthi.png' :
+                                                                    eventOnDay.Occasion.toLowerCase().includes('sashti') || eventOnDay.Occasion.toLowerCase().includes('karthigai') ? 'images/muruga.png' : 
+                                                                    'images/default-pooja.png' // Fallback icon for other occasions
+                                                                }
                                                                 alt={eventOnDay.Occasion}
                                                                 className="w-8 h-8 object-contain"
                                                                 onError={(e) => {
@@ -707,7 +713,7 @@
                                                                     e.target.nextSibling.style.display = 'block';
                                                                 }}
                                                             />
-                                                            <span className="text-xs text-orange-600 mt-1 font-medium" style={{display: 'none'}}>
+                                                            <span className="text-xs text-orange-600 mt-1 font-medium">
                                                                 {eventOnDay.Occasion}
                                                             </span>
                                                         </div>
@@ -753,6 +759,22 @@
                                             <div>
                                                 <p className="text-sm font-medium text-gray-800">Sankatahara Chaturthi</p>
                                                 <p className="text-xs text-gray-600">Monthly Sankatahara Chathurthi pooja</p>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center space-x-3">
+                                            <img 
+                                                src="images/muruga.png" 
+                                                alt="Sashti/Karthigai" 
+                                                className="w-10 h-10 object-contain"
+                                                onError={(e) => {
+                                                    e.target.style.display = 'none';
+                                                    e.target.nextSibling.style.display = 'block';
+                                                }}
+                                            />
+                                            <div style={{display: 'none'}} className="w-10 h-10 bg-red-200 rounded flex items-center justify-center text-xs">SC</div>
+                                            <div>
+                                                <p className="text-sm font-medium text-gray-800">Sashti/Karthigai</p>
+                                                <p className="text-xs text-gray-600">Monthly Sashti/Karthigai pooja</p>
                                             </div>
                                         </div>
                                     </div>

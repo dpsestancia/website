@@ -979,6 +979,8 @@ function renderMonthWiseView(rows) {
                         icon = '<img src="images/sankataharachathurthi.png" style="width:18px; vertical-align:middle;">'; // Or use an <img> tag for a custom Ganesha icon
                     } else if (d.name.toLowerCase().includes("pradosham")) {
                         icon = '<img src="images/pradosham.png" style="width:18px; vertical-align:middle;">'; // Or a Lingam icon/emoji
+                    } else if (d.name.toLowerCase().includes('sashti') || d.name.toLowerCase().includes('karthigai')) {
+                        icon = '<img src="images/muruga.png" style="width:18px; vertical-align:middle;">'; // Or a '🦚'; // Peacock emoji for Lord Muruga
                     }
 
                     return `
