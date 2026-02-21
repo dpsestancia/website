@@ -570,7 +570,7 @@
                                                                     {mediaLinks.map((link, linkIdx) => (
                                                                         <a
                                                                             key={linkIdx}
-                                                                            href={link.url}
+                                                                            href={link.type === 'YT' ? `https://www.youtube.com/watch?v=${link.url}` : link.url}
                                                                             target="_blank"
                                                                             rel="noopener noreferrer"
                                                                             className="text-orange-600 hover:text-orange-800"
