@@ -10,6 +10,16 @@
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/papaparse@5.4.1/papaparse.min.js"></script>
+    <style>
+        /* Prevent horizontal scroll on all containers */
+        html, body {
+            overflow-x: hidden;
+            max-width: 100vw;
+        }
+        * {
+            box-sizing: border-box;
+        }
+    </style>
 </head>
 <body>
     <div id="root"></div>
@@ -71,6 +81,12 @@
             </svg>
         );
 
+        const ChevronDown = ({ size = 20, className = "" }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+        );
+
         const MapPin = ({ size = 20, className = "" }) => (
             <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
                 <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
@@ -116,6 +132,7 @@
         const DharmaParipalanaSamithi = () => {
             const [activeSection, setActiveSection] = useState('home');
             const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+            const [resourcesDropdownOpen, setResourcesDropdownOpen] = useState(false);
             const [currentSlide, setCurrentSlide] = useState(0);
             const [currentMonth, setCurrentMonth] = useState(new Date());
             
@@ -124,6 +141,8 @@
             const [monthlyEvents, setMonthlyEvents] = useState([]);
             const [trustees, setTrustees] = useState([]);
             const [galleryImages, setGalleryImages] = useState([]);
+            const [audioFiles, setAudioFiles] = useState([]);
+            const [audioLoading, setAudioLoading] = useState(true);
             const [loading, setLoading] = useState(true);
 
             // Load CSV files from data directory
@@ -154,6 +173,19 @@
                         const manifestParsed = Papa.parse(manifestText, { header: true, skipEmptyLines: true });
                         setGalleryImages(manifestParsed.data);
 
+                        // Load audio_manifest.csv (optional - won't break if missing)
+                        try {
+                            const audioResponse = await fetch('data/audio_manifest.csv');
+                            if (audioResponse.ok) {
+                                const audioText = await audioResponse.text();
+                                const audioParsed = Papa.parse(audioText, { header: true, skipEmptyLines: true });
+                                setAudioFiles(audioParsed.data);
+                            }
+                        } catch (audioError) {
+                            console.log('Audio manifest not found - Listen page will show Coming Soon message');
+                        }
+                        setAudioLoading(false);
+
                         setLoading(false);
                     } catch (error) {
                         console.error('Error loading CSV files:', error);
@@ -174,6 +206,24 @@
                     return () => clearInterval(timer);
                 }
             }, [galleryImages]);
+
+            // Close dropdown when clicking outside
+            useEffect(() => {
+                const handleClickOutside = (event) => {
+                    if (resourcesDropdownOpen && !event.target.closest('.relative')) {
+                        setResourcesDropdownOpen(false);
+                    }
+                };
+                document.addEventListener('click', handleClickOutside);
+                return () => document.removeEventListener('click', handleClickOutside);
+            }, [resourcesDropdownOpen]);
+
+            // Close dropdown when changing sections
+            useEffect(() => {
+                if (!['learn', 'resources', 'listen'].includes(activeSection)) {
+                    setResourcesDropdownOpen(false);
+                }
+            }, [activeSection]);
 
             const parseDate = (dateStr) => {
                 if (!dateStr || dateStr.startsWith('Every')) return null;
@@ -276,8 +326,20 @@
                 { id: 'about', label: 'About Us', icon: <Users size={20} /> },
                 { id: 'events', label: 'Events', icon: <Calendar size={20} /> },
                 { id: 'calendar', label: 'Calendar 2026', icon: <Calendar size={20} /> },
+                { 
+                    id: 'resources-menu', 
+                    label: 'Resources', 
+                    icon: <ImageIcon size={20} />,
+                    hasDropdown: true,
+                    dropdownItems: [
+                        { id: 'learn', label: '📚 Learn' },
+                        { id: 'resources', label: '📖 Sacred Resources' },
+                        { id: 'listen', label: '🎧 Listen' }
+                    ]
+                },
                 { id: 'trustees', label: 'Trustees', icon: <Users size={20} /> },
                 { id: 'donation', label: 'Donate', icon: <ImageIcon size={20} /> },
+                { id: 'faq', label: 'FAQ', icon: <ImageIcon size={20} /> },
                 { id: 'contact', label: 'Contact', icon: <ImageIcon size={20} /> }
             ];
 
@@ -293,7 +355,7 @@
             }
 
             return (
-                <div className="min-h-screen bg-gradient-to-b from-orange-50 to-white">
+                <div className="min-h-screen bg-gradient-to-b from-orange-50 to-white overflow-x-hidden">
                     {/* Header */}
                     <header className="bg-gradient-to-r from-orange-600 to-red-600 text-white shadow-lg sticky top-0 z-50">
                         <div className="max-w-7xl mx-auto px-4 py-4">
@@ -320,20 +382,57 @@
                             </div>
                             
                             {/* Desktop Navigation */}
-                            <nav className="hidden md:flex space-x-6 mt-4">
+                            <nav className="hidden md:flex md:gap-3 lg:gap-4 mt-4">
                                 {navigation.map(item => (
-                                    <button
-                                        key={item.id}
-                                        onClick={() => setActiveSection(item.id)}
-                                        className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all ${
-                                            activeSection === item.id 
-                                                ? 'bg-white text-orange-600 shadow-md' 
-                                                : 'hover:bg-orange-700'
-                                        }`}
-                                    >
-                                        {item.icon}
-                                        <span>{item.label}</span>
-                                    </button>
+                                    item.hasDropdown ? (
+                                        <div key={item.id} className="relative">
+                                            <button
+                                                onClick={() => setResourcesDropdownOpen(!resourcesDropdownOpen)}
+                                                className={`flex items-center space-x-1 lg:space-x-2 px-3 lg:px-4 py-2 rounded-lg transition-all text-sm lg:text-base whitespace-nowrap ${
+                                                    ['learn', 'resources', 'listen'].includes(activeSection)
+                                                        ? 'bg-white text-orange-600 shadow-md' 
+                                                        : 'hover:bg-orange-700'
+                                                }`}
+                                            >
+                                                <span className="hidden lg:inline">{item.icon}</span>
+                                                <span>{item.label}</span>
+                                                <ChevronDown size={16} className={`transition-transform ${resourcesDropdownOpen ? 'rotate-180' : ''}`} />
+                                            </button>
+                                            {resourcesDropdownOpen && (
+                                                <div className="absolute top-full left-0 mt-2 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50 min-w-[200px]">
+                                                    {item.dropdownItems.map(subItem => (
+                                                        <button
+                                                            key={subItem.id}
+                                                            onClick={() => {
+                                                                setActiveSection(subItem.id);
+                                                                setResourcesDropdownOpen(false);
+                                                            }}
+                                                            className={`w-full text-left px-4 py-2 transition-colors ${
+                                                                activeSection === subItem.id
+                                                                    ? 'bg-orange-50 text-orange-600 font-semibold'
+                                                                    : 'text-gray-700 hover:bg-orange-50'
+                                                            }`}
+                                                        >
+                                                            {subItem.label}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+                                    ) : (
+                                        <button
+                                            key={item.id}
+                                            onClick={() => setActiveSection(item.id)}
+                                            className={`flex items-center space-x-1 lg:space-x-2 px-3 lg:px-4 py-2 rounded-lg transition-all text-sm lg:text-base whitespace-nowrap ${
+                                                activeSection === item.id 
+                                                    ? 'bg-white text-orange-600 shadow-md' 
+                                                    : 'hover:bg-orange-700'
+                                            }`}
+                                        >
+                                            <span className="hidden lg:inline">{item.icon}</span>
+                                            <span>{item.label}</span>
+                                        </button>
+                                    )
                                 ))}
                             </nav>
                             
@@ -341,21 +440,45 @@
                             {mobileMenuOpen && (
                                 <nav className="md:hidden mt-4 space-y-2">
                                     {navigation.map(item => (
-                                        <button
-                                            key={item.id}
-                                            onClick={() => {
-                                                setActiveSection(item.id);
-                                                setMobileMenuOpen(false);
-                                            }}
-                                            className={`flex items-center space-x-2 px-4 py-3 rounded-lg w-full transition-all ${
-                                                activeSection === item.id 
-                                                    ? 'bg-white text-orange-600' 
-                                                    : 'bg-orange-700'
-                                            }`}
-                                        >
-                                            {item.icon}
-                                            <span>{item.label}</span>
-                                        </button>
+                                        item.hasDropdown ? (
+                                            <div key={item.id} className="space-y-1">
+                                                <div className="px-4 py-2 bg-orange-800 rounded-lg text-sm font-semibold">
+                                                    {item.label}
+                                                </div>
+                                                {item.dropdownItems.map(subItem => (
+                                                    <button
+                                                        key={subItem.id}
+                                                        onClick={() => {
+                                                            setActiveSection(subItem.id);
+                                                            setMobileMenuOpen(false);
+                                                        }}
+                                                        className={`flex items-center space-x-2 px-6 py-2 rounded-lg w-full transition-all ${
+                                                            activeSection === subItem.id 
+                                                                ? 'bg-white text-orange-600' 
+                                                                : 'bg-orange-700'
+                                                        }`}
+                                                    >
+                                                        <span>{subItem.label}</span>
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        ) : (
+                                            <button
+                                                key={item.id}
+                                                onClick={() => {
+                                                    setActiveSection(item.id);
+                                                    setMobileMenuOpen(false);
+                                                }}
+                                                className={`flex items-center space-x-2 px-4 py-3 rounded-lg w-full transition-all ${
+                                                    activeSection === item.id 
+                                                        ? 'bg-white text-orange-600' 
+                                                        : 'bg-orange-700'
+                                                }`}
+                                            >
+                                                {item.icon}
+                                                <span>{item.label}</span>
+                                            </button>
+                                        )
                                     ))}
                                 </nav>
                             )}
@@ -1170,6 +1293,780 @@
                                 </div>
                             </div>
                         )}
+                        {/* Learn Section - Educational Landing Page */}
+                        {activeSection === 'learn' && (
+                            <div className="space-y-8">
+                                <div className="bg-white rounded-xl shadow-lg p-8">
+                                    <h2 className="text-4xl font-bold text-gray-800 mb-6 text-center border-b-2 border-orange-500 pb-4">
+                                        🕉️ Understanding Our Sacred Traditions 🕉️
+                                    </h2>
+                                    
+                                    <div className="grid md:grid-cols-2 gap-8 mb-8">
+                                        <div 
+                                            className="bg-gradient-to-br from-orange-50 to-orange-100 p-8 rounded-xl border-2 border-orange-300 shadow-lg cursor-pointer transition-all hover:shadow-2xl hover:scale-105"
+                                            onClick={() => setActiveSection('pradosham')}
+                                        >
+                                            <div className="text-center mb-6">
+                                                <img src="images/pradosham.png" alt="Pradosham" className="w-24 h-24 mx-auto object-contain" onError={(e) => e.target.style.display='none'} />
+                                            </div>
+                                            <h3 className="text-2xl font-bold text-orange-800 text-center mb-4">🔱 Why Pradosham?</h3>
+                                            <p className="text-gray-700 text-center leading-relaxed">
+                                                Discover the mystical significance of worshipping Lord Shiva during the twilight hour and the divine blessings it brings.
+                                            </p>
+                                            <div className="text-center mt-6">
+                                                <span className="inline-block bg-orange-700 text-white px-6 py-3 rounded-lg font-bold">
+                                                    Learn More →
+                                                </span>
+                                            </div>
+                                        </div>
+                                        
+                                        <div 
+                                            className="bg-gradient-to-br from-red-50 to-red-100 p-8 rounded-xl border-2 border-red-300 shadow-lg cursor-pointer transition-all hover:shadow-2xl hover:scale-105"
+                                            onClick={() => setActiveSection('sankatahara')}
+                                        >
+                                            <div className="text-center mb-6">
+                                                <img src="images/sankataharachathurthi.png" alt="Sankatahara Chaturthi" className="w-24 h-24 mx-auto object-contain" onError={(e) => e.target.style.display='none'} />
+                                            </div>
+                                            <h3 className="text-2xl font-bold text-red-800 text-center mb-4">🐘 Why Sankatahara Chaturthi?</h3>
+                                            <p className="text-gray-700 text-center leading-relaxed">
+                                                Learn about the powerful Chaturthi vratham that removes obstacles and grants Lord Ganesha's divine grace.
+                                            </p>
+                                            <div className="text-center mt-6">
+                                                <span className="inline-block bg-red-700 text-white px-6 py-3 rounded-lg font-bold">
+                                                    Learn More →
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="bg-orange-50 border-l-4 border-orange-600 p-6 rounded-lg">
+                                        <h3 className="text-xl font-semibold text-orange-800 mb-3">📚 Why Learn About These Sacred Practices?</h3>
+                                        <p className="text-gray-700 leading-relaxed text-justify">
+                                            Understanding the <strong>spiritual significance</strong> behind our rituals deepens our devotion and connection with the divine. 
+                                            Each pooja, each vratham carries centuries of wisdom passed down through generations. By learning the stories, 
+                                            meanings, and benefits of these sacred practices, we don't just perform rituals mechanically—we participate 
+                                            with <strong>full awareness, faith, and devotion</strong>, making our worship truly transformative.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Pradosham Detail Page */}
+                        {activeSection === 'pradosham' && (
+                            <div className="bg-white rounded-xl shadow-lg p-8 max-w-5xl mx-auto">
+                                <button 
+                                    onClick={() => setActiveSection('learn')} 
+                                    className="mb-6 px-4 py-2 border-2 border-orange-600 text-orange-600 rounded-lg hover:bg-orange-50 font-semibold"
+                                >
+                                    ← Back to Learn
+                                </button>
+                                
+                                <div className="text-center mb-8">
+                                    <img src="images/pradosham.png" alt="Pradosham" className="w-28 h-28 mx-auto object-contain mb-4" onError={(e) => e.target.style.display='none'} />
+                                    <h2 className="text-4xl font-bold text-orange-800 mb-2">🔱 The Divine Mystery of Pradosham 🔱</h2>
+                                    <p className="text-orange-600 font-semibold text-xl">The Twilight Hour of Lord Shiva</p>
+                                </div>
+                                
+                                <div className="space-y-6">
+                                    <div className="bg-gradient-to-br from-orange-50 to-orange-100 p-8 rounded-xl border-2 border-orange-300">
+                                        <h3 className="text-2xl font-bold text-orange-800 mb-4 border-b-2 border-orange-400 pb-2">📖 The Sacred Story</h3>
+                                        <div className="space-y-4 text-gray-800 leading-relaxed text-justify">
+                                            <p>
+                                                Long ago, during the <strong>Samudra Manthan</strong> (churning of the cosmic ocean), a deadly poison called <em>Halahala</em> 
+                                                emerged, threatening to destroy all of creation. The Devas and Asuras were terrified—no one could contain this 
+                                                destructive force. In that moment of crisis, <strong>Lord Shiva</strong>, the compassionate protector, came forward.
+                                            </p>
+                                            <p>
+                                                With infinite courage, Shiva consumed the poison to save the universe. Goddess Parvati, seeing the danger, 
+                                                immediately held His throat to prevent the poison from descending. The poison turned His throat blue, 
+                                                giving Him the name <strong>Neelakantha</strong> (the blue-throated one). This supreme sacrifice happened during 
+                                                the <strong>Pradosham time</strong>—the twilight period between sunset and darkness.
+                                            </p>
+                                            <p>
+                                                Since that divine moment, <strong>Pradosham</strong> became the most auspicious time to worship Lord Shiva. 
+                                                It is said that during this twilight hour, Shiva performs His cosmic dance (<em>Ananda Tandavam</em>) in Mount Kailash, 
+                                                and the divine couple—Shiva and Parvati—are in their most gracious mood, readily blessing devotees who worship them.
+                                            </p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="bg-white p-8 rounded-xl border-l-4 border-orange-600 shadow-md">
+                                        <h3 className="text-2xl font-bold text-orange-800 mb-4">🕐 What is Pradosham Time?</h3>
+                                        <p className="text-gray-800 leading-relaxed mb-4">
+                                            <strong>Pradosham</strong> is the 3-hour period that begins 1.5 hours before sunset and extends 1.5 hours after sunset. 
+                                            This sacred twilight time occurs twice every lunar month:
+                                        </p>
+                                        <ul className="space-y-2 text-gray-800 ml-6 list-disc">
+                                            <li><strong>Trayodashi</strong> (13th day) of both the waxing moon (Shukla Paksha) and waning moon (Krishna Paksha)</li>
+                                            <li>Approximately <strong>1 hour 30 minutes before to 1 hour 30 minutes after sunset</strong></li>
+                                            <li>The most spiritually potent time for Shiva worship</li>
+                                        </ul>
+                                        <div className="mt-4 bg-orange-50 p-4 rounded-lg">
+                                            <p className="font-semibold text-orange-800 mb-2">Special Pradoshams:</p>
+                                            <p>🌙 <strong>Soma Pradosham</strong> (Monday) - Most auspicious</p>
+                                            <p>🔥 <strong>Bhowma Pradosham</strong> (Tuesday) - For courage and strength</p>
+                                            <p>🌟 <strong>Shani Pradosham</strong> (Saturday) - For removing Saturn's adverse effects</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="bg-gradient-to-br from-orange-100 to-yellow-100 p-8 rounded-xl">
+                                        <h3 className="text-2xl font-bold text-orange-800 mb-6">🙏 Spiritual Benefits of Pradosham Worship</h3>
+                                        <div className="grid md:grid-cols-2 gap-6">
+                                            <div className="bg-white p-6 rounded-lg border-l-4 border-orange-500">
+                                                <div className="text-4xl mb-3">✨</div>
+                                                <h4 className="text-lg font-bold text-orange-800 mb-2">Removal of Sins</h4>
+                                                <p className="text-gray-700">Worshipping during Pradosham absolves past karmic debts and purifies the soul.</p>
+                                            </div>
+                                            <div className="bg-white p-6 rounded-lg border-l-4 border-orange-500">
+                                                <div className="text-4xl mb-3">🌟</div>
+                                                <h4 className="text-lg font-bold text-orange-800 mb-2">Peace & Prosperity</h4>
+                                                <p className="text-gray-700">Brings mental peace, family harmony, and material prosperity.</p>
+                                            </div>
+                                            <div className="bg-white p-6 rounded-lg border-l-4 border-orange-500">
+                                                <div className="text-4xl mb-3">🛡️</div>
+                                                <h4 className="text-lg font-bold text-orange-800 mb-2">Divine Protection</h4>
+                                                <p className="text-gray-700">Shiva's grace shields devotees from negative energies and obstacles.</p>
+                                            </div>
+                                            <div className="bg-white p-6 rounded-lg border-l-4 border-orange-500">
+                                                <div className="text-4xl mb-3">🕉️</div>
+                                                <h4 className="text-lg font-bold text-orange-800 mb-2">Spiritual Liberation</h4>
+                                                <p className="text-gray-700">Guides the soul towards moksha (liberation) through divine connection.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="bg-white p-8 rounded-xl border-2 border-orange-600">
+                                        <h3 className="text-2xl font-bold text-orange-800 mb-4 text-center">🔔 How We Celebrate at DPS Estancia</h3>
+                                        <div className="space-y-4 text-gray-800 leading-relaxed text-justify">
+                                            <p>
+                                                Every Pradosham, our Samithi organizes a sacred worship at the <strong>Vidya Mandir Ganapathi Temple</strong> within Estancia. 
+                                                We are blessed to have <strong>Vedic scholars from Athur Chaturveda Patashala</strong> who perform the rituals with authentic 
+                                                Vedic chanting. The atmosphere resonates with the divine vibrations of <em>Rudram, Chamakam,</em> and <em>Shiva stotrams</em>.
+                                            </p>
+                                            <p>
+                                                Devotees gather, offer prayers, and receive prasadam. It's a beautiful community experience where young and old 
+                                                come together, connecting with our ancient traditions in modern times.
+                                            </p>
+                                        </div>
+                                        <div className="flex flex-wrap gap-4 justify-center mt-6">
+                                            <button 
+                                                onClick={() => setActiveSection('calendar')} 
+                                                className="bg-orange-700 text-white px-6 py-3 rounded-lg font-bold hover:bg-orange-800"
+                                            >
+                                                📅 View Pradosham Calendar
+                                            </button>
+                                            <button 
+                                                onClick={() => setActiveSection('resources')} 
+                                                className="bg-orange-100 text-orange-800 border-2 border-orange-600 px-6 py-3 rounded-lg font-bold hover:bg-orange-200"
+                                            >
+                                                📖 Access Pradosham Parayanam
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="bg-orange-50 p-6 rounded-lg border-l-4 border-orange-500 text-center">
+                                        <p className="text-xl font-semibold italic text-orange-800">
+                                            "प्रदोषे तु विशेषेण शिवपूजां समाचरेत्"
+                                        </p>
+                                        <p className="text-gray-600 mt-2">
+                                            (One should worship Lord Shiva especially during Pradosham time)
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Sankatahara Chaturthi Detail Page */}
+                        {activeSection === 'sankatahara' && (
+                            <div className="bg-white rounded-xl shadow-lg p-8 max-w-5xl mx-auto">
+                                <button 
+                                    onClick={() => setActiveSection('learn')} 
+                                    className="mb-6 px-4 py-2 border-2 border-red-600 text-red-600 rounded-lg hover:bg-red-50 font-semibold"
+                                >
+                                    ← Back to Learn
+                                </button>
+                                
+                                <div className="text-center mb-8">
+                                    <img src="images/sankataharachathurthi.png" alt="Sankatahara Chaturthi" className="w-28 h-28 mx-auto object-contain mb-4" onError={(e) => e.target.style.display='none'} />
+                                    <h2 className="text-4xl font-bold text-red-800 mb-2">🐘 The Power of Sankatahara Chaturthi 🐘</h2>
+                                    <p className="text-red-600 font-semibold text-xl">Lord Ganesha's Day to Remove All Obstacles</p>
+                                </div>
+                                
+                                <div className="space-y-6">
+                                    <div className="bg-gradient-to-br from-red-50 to-red-100 p-8 rounded-xl border-2 border-red-300">
+                                        <h3 className="text-2xl font-bold text-red-800 mb-4 border-b-2 border-red-400 pb-2">📖 The Divine Legend</h3>
+                                        <div className="space-y-4 text-gray-800 leading-relaxed text-justify">
+                                            <p>
+                                                Once upon a time, there lived a devoted king named <strong>Chandrasen</strong> who ruled the kingdom of Manipur. 
+                                                Despite being a righteous ruler, misfortune struck his life one after another—his kingdom faced disasters, 
+                                                his wealth diminished, and sorrow filled his palace. Desperate for a solution, the king consulted a wise sage.
+                                            </p>
+                                            <p>
+                                                The sage revealed that the king was suffering due to past karmic debts and recommended observing the 
+                                                <strong> Sankatahara Chaturthi Vratham</strong>—a sacred fast dedicated to <strong>Lord Ganesha</strong>, performed on 
+                                                the Chaturthi (4th day) of the waning moon (Krishna Paksha) every month.
+                                            </p>
+                                            <p>
+                                                With unwavering faith, King Chandrasen began observing the vratham diligently. He fasted, performed abhishekam 
+                                                to Ganesha with devotion, and chanted the <em>Sankashta Nashana Ganesha Stotram</em>. Miraculously, within a few months, 
+                                                all his troubles vanished—<strong>Sankata</strong> (difficulties) were <strong>hara</strong> (removed). His kingdom 
+                                                flourished again, and his life was filled with prosperity and happiness.
+                                            </p>
+                                            <div className="bg-white p-4 rounded-lg border-l-4 border-red-600 mt-4">
+                                                <p className="font-semibold text-red-800">The Promise:</p>
+                                                <p className="text-gray-700">
+                                                    Since then, Lord Ganesha blessed this day with a divine pledge—anyone who observes 
+                                                    Sankatahara Chaturthi with sincere devotion will have their obstacles removed, difficulties erased, and wishes fulfilled.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="bg-white p-8 rounded-xl border-l-4 border-red-600 shadow-md">
+                                        <h3 className="text-2xl font-bold text-red-800 mb-4">🌙 Understanding Sankatahara Chaturthi</h3>
+                                        <p className="text-gray-800 leading-relaxed mb-4">
+                                            <strong>Sankatahara Chaturthi</strong> falls on the 4th day of the Krishna Paksha (waning phase of the moon) every month. 
+                                            The term breaks down beautifully:
+                                        </p>
+                                        <ul className="space-y-2 text-gray-800 ml-6 list-disc">
+                                            <li><strong>Sankata</strong> = Difficulties, obstacles, troubles</li>
+                                            <li><strong>Hara</strong> = Remover, destroyer</li>
+                                            <li><strong>Chaturthi</strong> = Fourth day of the lunar fortnight</li>
+                                        </ul>
+                                        <p className="text-gray-800 leading-relaxed mt-4">
+                                            Thus, <strong>Sankatahara Chaturthi</strong> literally means <em>"the fourth day that removes all difficulties."</em>
+                                        </p>
+                                        <div className="mt-4 bg-red-50 p-4 rounded-lg">
+                                            <p className="font-semibold text-red-800 mb-2">🎯 When to Observe:</p>
+                                            <p>🗓️ Every month on Krishna Paksha Chaturthi (4th day after full moon)</p>
+                                            <p>🌟 <strong>Angaraka Sankatahara</strong> (falling on Tuesday) is considered the most powerful</p>
+                                            <p>🙏 Fasting and worship ideally done until moonrise, followed by prasadam</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="bg-gradient-to-br from-red-100 to-yellow-100 p-8 rounded-xl">
+                                        <h3 className="text-2xl font-bold text-red-800 mb-6">🌟 Blessings of Observing Sankatahara Chaturthi</h3>
+                                        <div className="grid md:grid-cols-2 gap-6">
+                                            <div className="bg-white p-6 rounded-lg border-l-4 border-red-500">
+                                                <div className="text-4xl mb-3">🛡️</div>
+                                                <h4 className="text-lg font-bold text-red-800 mb-2">Obstacle Removal</h4>
+                                                <p className="text-gray-700">Clears all hurdles in personal, professional, and spiritual life.</p>
+                                            </div>
+                                            <div className="bg-white p-6 rounded-lg border-l-4 border-red-500">
+                                                <div className="text-4xl mb-3">💡</div>
+                                                <h4 className="text-lg font-bold text-red-800 mb-2">Wisdom & Clarity</h4>
+                                                <p className="text-gray-700">Enhances intellect, decision-making ability, and mental clarity.</p>
+                                            </div>
+                                            <div className="bg-white p-6 rounded-lg border-l-4 border-red-500">
+                                                <div className="text-4xl mb-3">🎯</div>
+                                                <h4 className="text-lg font-bold text-red-800 mb-2">Success in Endeavors</h4>
+                                                <p className="text-gray-700">Grants success in new beginnings, exams, business, and projects.</p>
+                                            </div>
+                                            <div className="bg-white p-6 rounded-lg border-l-4 border-red-500">
+                                                <div className="text-4xl mb-3">🕉️</div>
+                                                <h4 className="text-lg font-bold text-red-800 mb-2">Family Harmony</h4>
+                                                <p className="text-gray-700">Brings peace, prosperity, and happiness to the household.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="bg-white p-8 rounded-xl border-2 border-red-600">
+                                        <h3 className="text-2xl font-bold text-red-800 mb-4">📿 The Vratham Procedure (Simplified)</h3>
+                                        <div className="space-y-3 text-gray-800">
+                                            <p><strong>1. Morning:</strong> Wake up early, take a bath, and sanctify yourself</p>
+                                            <p><strong>2. Sankalpam:</strong> Take a vow (sankalpam) to observe the fast with full devotion</p>
+                                            <p><strong>3. Fasting:</strong> Observe complete fast or consume only fruits (as per capacity)</p>
+                                            <p><strong>4. Worship:</strong> Perform Ganesha pooja with flowers, modak (his favorite), durva grass</p>
+                                            <p><strong>5. Chanting:</strong> Recite <em>Ganapathi Atharvashirsha</em>, <em>Ganesha Ashtottaram</em>, or <em>Sankatahara Stotram</em></p>
+                                            <p><strong>6. Moonrise:</strong> Break the fast only after sighting the moon in the evening</p>
+                                            <p><strong>7. Prasadam:</strong> Offer and consume prasadam (especially modak or sweet pongal)</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="bg-white p-8 rounded-xl border-2 border-red-600">
+                                        <h3 className="text-2xl font-bold text-red-800 mb-4 text-center">🔔 How We Celebrate at DPS Estancia</h3>
+                                        <div className="space-y-4 text-gray-800 leading-relaxed text-justify">
+                                            <p>
+                                                On every <strong>Sankatahara Chaturthi</strong>, our Samithi conducts a special <strong>Ganapathi Homam and Abhishekam</strong> 
+                                                at the <strong>Vidya Mandir Ganapathi Temple</strong>. Families gather to participate in the sacred rituals, and children 
+                                                especially love offering modaks and receiving Ganesha's blessings.
+                                            </p>
+                                            <p>
+                                                The pooja includes <strong>Vedic chanting, 108 names of Ganesha</strong>, and distribution of prasadam to all devotees. 
+                                                It's a powerful community practice where we collectively pray for the removal of obstacles from our lives and 
+                                                the prosperity of every household in Estancia.
+                                            </p>
+                                        </div>
+                                        <div className="flex flex-wrap gap-4 justify-center mt-6">
+                                            <button 
+                                                onClick={() => setActiveSection('calendar')} 
+                                                className="bg-red-700 text-white px-6 py-3 rounded-lg font-bold hover:bg-red-800"
+                                            >
+                                                📅 View Chaturthi Calendar
+                                            </button>
+                                            <button 
+                                                onClick={() => setActiveSection('resources')} 
+                                                className="bg-red-100 text-red-800 border-2 border-red-600 px-6 py-3 rounded-lg font-bold hover:bg-red-200"
+                                            >
+                                                📖 Access Chaturthi Parayanam
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="bg-red-50 p-6 rounded-lg border-l-4 border-red-500 text-center">
+                                        <p className="text-xl font-semibold italic text-red-800 mb-2">
+                                            "वक्रतुण्ड महाकाय सूर्यकोटि समप्रभ।<br/>
+                                            निर्विघ्नं कुरु मे देव सर्वकार्येषु सर्वदा॥"
+                                        </p>
+                                        <p className="text-gray-600 mt-3">
+                                            (O Lord with the curved trunk, with the brilliance of million suns,<br/>
+                                            Please remove obstacles from all my endeavors, always)
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Listen - Audio Parayanam Page */}
+                        {activeSection === 'listen' && (
+                            <div className="bg-white rounded-xl shadow-lg p-8">
+                                <h2 className="text-4xl font-bold text-gray-800 mb-4 text-center border-b-2 border-orange-500 pb-4">
+                                    🎧 Listen to Sacred Parayanam 🎧
+                                </h2>
+                                <p className="text-center text-xl text-gray-600 mb-8">
+                                    Listen to authentic recitations of stotrams, mantras, and parayanam with proper pronunciation
+                                </p>
+                                
+                                <div className="bg-gradient-to-br from-orange-50 to-yellow-50 p-8 rounded-2xl border-2 border-orange-300 shadow-md mb-8">
+                                    <div className="flex items-center gap-6 mb-4">
+                                        <div className="text-5xl">🎵</div>
+                                        <div>
+                                            <h3 className="text-2xl font-bold text-orange-800 mb-2">Audio Recordings Available!</h3>
+                                            <p className="text-gray-700">
+                                                Listen online or download MP3 files for offline listening during your daily pooja
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                {audioLoading ? (
+                                    <div className="text-center py-16">
+                                        <div className="text-6xl mb-4">⏳</div>
+                                        <p className="text-gray-600">Loading audio library...</p>
+                                    </div>
+                                ) : audioFiles.length === 0 ? (
+                                    <div className="bg-gradient-to-br from-orange-50 to-yellow-50 p-10 rounded-2xl border-2 border-orange-300 shadow-xl text-center mb-8">
+                                        <div className="text-7xl mb-6">📻</div>
+                                        <h3 className="text-3xl font-bold text-orange-800 mb-4">Audio Library Coming Soon!</h3>
+                                        <p className="text-lg text-gray-700 leading-relaxed mb-2 max-w-3xl mx-auto">
+                                            We're working on recording high-quality audio versions of all parayanams. <br />
+                                            In the meantime, download PDF texts from our{' '}
+                                            <button onClick={() => setActiveSection('resources')} className="text-orange-700 font-bold underline">
+                                                Sacred Resources page
+                                            </button>
+                                        </p>
+                                    </div>
+                                ) : (
+                                    <div className="space-y-8">
+                                        {/* Pradosham Audio */}
+                                        {audioFiles.filter(a => a.Category?.toLowerCase().includes('pradosham')).length > 0 && (
+                                            <div className="bg-orange-50 p-6 rounded-xl border-l-4 border-orange-600">
+                                                <div className="flex items-center gap-4 mb-6">
+                                                    <img src="images/pradosham.png" alt="Pradosham" className="w-12 h-12 object-contain" onError={(e) => e.target.style.display='none'} />
+                                                    <h4 className="text-2xl font-bold text-orange-800">🔱 Pradosham Parayanam</h4>
+                                                </div>
+                                                <div className="space-y-4">
+                                                    {audioFiles.filter(a => a.Category?.toLowerCase().includes('pradosham')).map((audio, idx) => (
+                                                        <div key={idx} className="bg-white p-6 rounded-xl shadow-md border border-gray-200">
+                                                            <div className="flex justify-between items-start mb-4">
+                                                                <div>
+                                                                    <h5 className="text-lg font-bold text-orange-800 mb-2">{audio.Title}</h5>
+                                                                    <div className="text-sm text-gray-600 space-x-4">
+                                                                        <span>🕒 {audio.Duration || 'N/A'}</span>
+                                                                        <span>🌏 {audio.Language || 'Sanskrit'}</span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            {audio.Description && (
+                                                                <p className="text-gray-700 mb-4 leading-relaxed">{audio.Description}</p>
+                                                            )}
+                                                            <audio controls preload="metadata" className="w-full mb-3">
+                                                                <source src={audio.Filename} type="audio/mpeg" />
+                                                                Your browser does not support audio playback. <a href={audio.Filename} download className="text-orange-700 font-bold underline">Download MP3</a>
+                                                            </audio>
+                                                            <div className="text-right">
+                                                                <a href={audio.Filename} download className="text-sm text-orange-700 font-bold hover:underline">
+                                                                    📥 Download MP3
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+                                        
+                                        {/* Sankatahara Audio */}
+                                        {audioFiles.filter(a => a.Category?.toLowerCase().includes('sankat')).length > 0 && (
+                                            <div className="bg-red-50 p-6 rounded-xl border-l-4 border-red-600">
+                                                <div className="flex items-center gap-4 mb-6">
+                                                    <img src="images/sankataharachathurthi.png" alt="Sankatahara" className="w-12 h-12 object-contain" onError={(e) => e.target.style.display='none'} />
+                                                    <h4 className="text-2xl font-bold text-red-800">🐘 Sankatahara Chaturthi Parayanam</h4>
+                                                </div>
+                                                <div className="space-y-4">
+                                                    {audioFiles.filter(a => a.Category?.toLowerCase().includes('sankat')).map((audio, idx) => (
+                                                        <div key={idx} className="bg-white p-6 rounded-xl shadow-md border border-gray-200">
+                                                            <div className="flex justify-between items-start mb-4">
+                                                                <div>
+                                                                    <h5 className="text-lg font-bold text-red-800 mb-2">{audio.Title}</h5>
+                                                                    <div className="text-sm text-gray-600 space-x-4">
+                                                                        <span>🕒 {audio.Duration || 'N/A'}</span>
+                                                                        <span>🌏 {audio.Language || 'Sanskrit'}</span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            {audio.Description && (
+                                                                <p className="text-gray-700 mb-4 leading-relaxed">{audio.Description}</p>
+                                                            )}
+                                                            <audio controls preload="metadata" className="w-full mb-3">
+                                                                <source src={audio.Filename} type="audio/mpeg" />
+                                                                Your browser does not support audio playback. <a href={audio.Filename} download className="text-red-700 font-bold underline">Download MP3</a>
+                                                            </audio>
+                                                            <div className="text-right">
+                                                                <a href={audio.Filename} download className="text-sm text-red-700 font-bold hover:underline">
+                                                                    📥 Download MP3
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+                                        
+                                        {/* Daily Audio */}
+                                        {audioFiles.filter(a => a.Category?.toLowerCase().includes('daily')).length > 0 && (
+                                            <div className="bg-green-50 p-6 rounded-xl border-l-4 border-green-600">
+                                                <div className="flex items-center gap-4 mb-6">
+                                                    <div className="text-4xl">🙏</div>
+                                                    <h4 className="text-2xl font-bold text-green-800">Daily Prayers & Stotrams</h4>
+                                                </div>
+                                                <div className="space-y-4">
+                                                    {audioFiles.filter(a => a.Category?.toLowerCase().includes('daily')).map((audio, idx) => (
+                                                        <div key={idx} className="bg-white p-6 rounded-xl shadow-md border border-gray-200">
+                                                            <div className="flex justify-between items-start mb-4">
+                                                                <div>
+                                                                    <h5 className="text-lg font-bold text-green-800 mb-2">{audio.Title}</h5>
+                                                                    <div className="text-sm text-gray-600 space-x-4">
+                                                                        <span>🕒 {audio.Duration || 'N/A'}</span>
+                                                                        <span>🌏 {audio.Language || 'Sanskrit'}</span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            {audio.Description && (
+                                                                <p className="text-gray-700 mb-4 leading-relaxed">{audio.Description}</p>
+                                                            )}
+                                                            <audio controls preload="metadata" className="w-full mb-3">
+                                                                <source src={audio.Filename} type="audio/mpeg" />
+                                                                Your browser does not support audio playback. <a href={audio.Filename} download className="text-green-700 font-bold underline">Download MP3</a>
+                                                            </audio>
+                                                            <div className="text-right">
+                                                                <a href={audio.Filename} download className="text-sm text-green-700 font-bold hover:underline">
+                                                                    📥 Download MP3
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+                                
+                                <div className="bg-orange-50 p-6 rounded-lg border-2 border-orange-300 mt-8">
+                                    <h3 className="text-xl font-bold text-orange-800 mb-4 text-center">💡 How to Use Audio Recordings</h3>
+                                    <ul className="space-y-3 text-gray-700 max-w-3xl mx-auto">
+                                        <li className="flex items-start">
+                                            <span className="font-bold mr-3">🎧</span>
+                                            <span><strong>Listen Online:</strong> Click play button to hear the recitation in your browser</span>
+                                        </li>
+                                        <li className="flex items-start">
+                                            <span className="font-bold mr-3">📥</span>
+                                            <span><strong>Download:</strong> Click the download link to save for offline use</span>
+                                        </li>
+                                        <li className="flex items-start">
+                                            <span className="font-bold mr-3">📱</span>
+                                            <span><strong>Mobile Friendly:</strong> Works on all smartphones and tablets</span>
+                                        </li>
+                                        <li className="flex items-start">
+                                            <span className="font-bold mr-3">🔄</span>
+                                            <span><strong>Loop & Practice:</strong> Use player controls to pause, rewind, and repeat sections</span>
+                                        </li>
+                                        <li className="flex items-start">
+                                            <span className="font-bold mr-3">📖</span>
+                                            <span><strong>Follow Along:</strong> Download the PDF text to read while listening</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                                
+                                <div className="bg-white p-6 rounded-lg border-l-4 border-orange-600 mt-6 shadow-md">
+                                    <h3 className="text-xl font-bold text-orange-800 mb-3">🎤 Contribute Audio Recordings</h3>
+                                    <p className="text-gray-700 leading-relaxed">
+                                        If you have clear audio recordings of any parayanam or would like to help with recording, please{' '}
+                                        <button onClick={() => setActiveSection('contact')} className="text-orange-700 font-bold underline">
+                                            contact us
+                                        </button>.
+                                        We're looking for volunteers with good pronunciation and recording equipment. See our{' '}
+                                        <a href="AUDIO-SETUP-GUIDE.md" target="_blank" rel="noopener noreferrer" className="text-orange-700 font-bold underline">
+                                            Audio Setup Guide
+                                        </a> for technical details.
+                                    </p>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Sacred Resources Page */}
+                        {activeSection === 'resources' && (
+                            <div className="bg-white rounded-xl shadow-lg p-8">
+                                <h2 className="text-4xl font-bold text-gray-800 mb-4 text-center border-b-2 border-orange-500 pb-4">
+                                    📚 Sacred Resources & Digital Library 📚
+                                </h2>
+                                <p className="text-center text-xl text-gray-600 mb-8">
+                                    Access authentic parayanam texts, stotrams, and prayer guides to deepen your spiritual practice
+                                </p>
+                                
+                                <div className="bg-gradient-to-br from-orange-50 to-yellow-50 p-10 rounded-2xl border-3 border-orange-400 shadow-2xl mb-8 text-center">
+                                    <div className="text-7xl mb-6">🕉️</div>
+                                    <h3 className="text-3xl font-bold text-orange-800 mb-4">Tamil Parayanam Collection</h3>
+                                    <p className="text-lg text-gray-700 leading-relaxed mb-6 max-w-3xl mx-auto">
+                                        Complete collection of monthly pooja parayanams, including <strong>Pradosham, Sankatahara Chaturthi, Ashtottaram, Trisathi</strong>, and more—all in Tamil script for easy reading during worship.
+                                    </p>
+                                    <a 
+                                        href="https://drive.google.com/drive/folders/1EMRtJNfD55xo_bV5o2E1_5SS-73lvuCB" 
+                                        target="_blank" 
+                                        rel="noopener noreferrer"
+                                        className="inline-block bg-gradient-to-r from-orange-600 to-red-600 text-white px-10 py-4 rounded-xl font-bold text-xl shadow-lg hover:shadow-2xl hover:scale-105 transition-all"
+                                    >
+                                        📂 Access Tamil Parayanam Library →
+                                    </a>
+                                    <p className="text-sm text-gray-500 mt-4">Opens in Google Drive • View, Download, or Print</p>
+                                </div>
+                                
+                                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                                    <div className="bg-white p-6 rounded-xl border-2 border-gray-200 shadow-md hover:shadow-xl transition-shadow">
+                                        <div className="text-5xl text-center mb-4">🔱</div>
+                                        <h4 className="text-lg font-bold text-orange-800 text-center mb-3">Pradosham Vratham</h4>
+                                        <ul className="text-sm text-gray-700 space-y-2">
+                                            <li>• Pradosham Stotram</li>
+                                            <li>• Shiva Ashtottara (108 names)</li>
+                                            <li>• Rudram & Chamakam</li>
+                                            <li>• Shiva Panchakshari Stotram</li>
+                                        </ul>
+                                    </div>
+                                    
+                                    <div className="bg-white p-6 rounded-xl border-2 border-gray-200 shadow-md hover:shadow-xl transition-shadow">
+                                        <div className="text-5xl text-center mb-4">🐘</div>
+                                        <h4 className="text-lg font-bold text-orange-800 text-center mb-3">Sankatahara Chaturthi</h4>
+                                        <ul className="text-sm text-gray-700 space-y-2">
+                                            <li>• Ganapathi Atharvashirsha</li>
+                                            <li>• Ganesha Ashtottaram</li>
+                                            <li>• Sankatahara Stotram</li>
+                                            <li>• Ganesha Sahasranamam</li>
+                                        </ul>
+                                    </div>
+                                    
+                                    <div className="bg-white p-6 rounded-xl border-2 border-gray-200 shadow-md hover:shadow-xl transition-shadow">
+                                        <div className="text-5xl text-center mb-4">🙏</div>
+                                        <h4 className="text-lg font-bold text-orange-800 text-center mb-3">Daily Prayers</h4>
+                                        <ul className="text-sm text-gray-700 space-y-2">
+                                            <li>• Suprabhatam</li>
+                                            <li>• Vishnu Sahasranamam</li>
+                                            <li>• Lalitha Sahasranamam</li>
+                                            <li>• Hanuman Chalisa</li>
+                                        </ul>
+                                    </div>
+                                    
+                                    <div className="bg-white p-6 rounded-xl border-2 border-gray-200 shadow-md hover:shadow-xl transition-shadow">
+                                        <div className="text-5xl text-center mb-4">📖</div>
+                                        <h4 className="text-lg font-bold text-orange-800 text-center mb-3">Special Occasions</h4>
+                                        <ul className="text-sm text-gray-700 space-y-2">
+                                            <li>• Maha Shivarathri Parayanam</li>
+                                            <li>• Vinayaka Chaturthi Vratham</li>
+                                            <li>• Sri Ramanavami Prayers</li>
+                                            <li>• Ayyappa Saranam Mantras</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                
+                                <div className="bg-white p-8 rounded-xl border-l-4 border-orange-600 shadow-md">
+                                    <h3 className="text-2xl font-bold text-orange-800 mb-4">📌 How to Use These Resources</h3>
+                                    <ul className="space-y-3 text-gray-700 text-lg">
+                                        <li>✅ <strong>Download PDFs</strong> to your device for offline access during pooja</li>
+                                        <li>✅ <strong>Print copies</strong> to keep at your home temple for daily reference</li>
+                                        <li>✅ <strong>Share with family</strong> members to encourage collective worship</li>
+                                        <li>✅ <strong>Recite regularly</strong> to internalize the sacred verses and deepen devotion</li>
+                                        <li>✅ <strong>Teach children</strong> these prayers to pass down our spiritual heritage</li>
+                                    </ul>
+                                </div>
+                                
+                                <div className="bg-orange-50 p-6 rounded-lg border-2 border-orange-300 mt-8 text-center">
+                                    <p className="text-lg font-semibold italic text-orange-800">
+                                        <strong>"श्रुति स्मृति पुराणानां आलयं करुणालयम्"</strong>
+                                    </p>
+                                    <p className="text-gray-600 mt-3 leading-relaxed">
+                                        (The repository of Vedas, Smritis and Puranas is the abode of compassion)<br/><br/>
+                                        These sacred texts have been preserved for millennia—may they guide us towards dharma and divine bliss.
+                                    </p>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* FAQ Page */}
+                        {activeSection === 'faq' && (
+                            <div className="bg-white rounded-xl shadow-lg p-8 max-w-5xl mx-auto">
+                                <h2 className="text-4xl font-bold text-gray-800 mb-4 text-center border-b-2 border-orange-500 pb-4">
+                                    ❓ Frequently Asked Questions ❓
+                                </h2>
+                                <p className="text-center text-lg text-gray-600 mb-8">
+                                    Common questions about DPS Estancia, our activities, donations, and participation
+                                </p>
+                                
+                                <div className="space-y-4">
+                                    <div className="bg-orange-50 p-6 rounded-lg border-l-4 border-orange-600">
+                                        <h3 className="text-xl font-bold text-orange-800 mb-3">🏛️ What is Dharma Paripalana Samithi Estancia?</h3>
+                                        <p className="text-gray-700 leading-relaxed">
+                                            DPS Estancia is a <strong>registered charitable trust (Regn# 187/2021)</strong> founded by Estancia residents 
+                                            to promote and spread the values of <strong>Sanatana Dharma</strong>. We organize regular poojas, bhajans, 
+                                            spiritual discourses, and charitable activities like Annadhanam for the benefit of our community and beyond.
+                                        </p>
+                                    </div>
+                                    
+                                    <div className="bg-white p-6 rounded-lg border-l-4 border-orange-400">
+                                        <h3 className="text-xl font-bold text-orange-800 mb-3">👥 Who can participate in DPS activities?</h3>
+                                        <p className="text-gray-700 leading-relaxed">
+                                            <strong>Everyone is welcome!</strong> While DPS was founded by Estancia residents, our events are open to 
+                                            <strong> all devotees</strong>—whether you live in Estancia, nearby areas, or are visiting. We believe spirituality 
+                                            transcends boundaries. Non-residents are warmly invited to attend our poojas, bhajans, and special events.
+                                        </p>
+                                    </div>
+                                    
+                                    <div className="bg-orange-50 p-6 rounded-lg border-l-4 border-orange-600">
+                                        <h3 className="text-xl font-bold text-orange-800 mb-3">📅 When do monthly poojas happen?</h3>
+                                        <p className="text-gray-700 leading-relaxed">
+                                            We conduct <strong>Pradosham</strong> (twice/month on Trayodashi) and <strong>Sankatahara Chaturthi</strong> 
+                                            (monthly on Krishna Paksha Chaturthi) poojas at the <strong>Vidya Mandir Ganapathi Temple</strong> within Estancia. 
+                                            Timings are typically during the sacred hours (Pradosham around sunset, Chaturthi after moonrise). 
+                                            <button onClick={() => setActiveSection('calendar')} className="text-orange-700 font-bold underline ml-1">
+                                                Check our Activities Calendar
+                                            </button> for exact dates.
+                                        </p>
+                                    </div>
+                                    
+                                    <div className="bg-white p-6 rounded-lg border-l-4 border-orange-400">
+                                        <h3 className="text-xl font-bold text-orange-800 mb-3">💰 Are donations tax-deductible?</h3>
+                                        <p className="text-gray-700 leading-relaxed">
+                                            <strong>Yes!</strong> DPS is registered under <strong>Section 80G</strong>, which means your donations are eligible 
+                                            for tax deductions under Indian Income Tax laws. After you donate, please fill out the <strong>Donation Intimation Form</strong> 
+                                            on our Donations page, and we will issue you an official <strong>80G certificate</strong> for tax filing purposes. 
+                                            Make sure the name matches your PAN card records.
+                                        </p>
+                                    </div>
+                                    
+                                    <div className="bg-orange-50 p-6 rounded-lg border-l-4 border-orange-600">
+                                        <h3 className="text-xl font-bold text-orange-800 mb-3">🎯 What is Sankalpam Registration?</h3>
+                                        <p className="text-gray-700 leading-relaxed">
+                                            <strong>Sankalpam</strong> is a personalized prayer intention recited during poojas with your family details 
+                                            (Gothram, Nakshatram, names of family members). To ensure accurate pronunciation and blessings, we maintain a 
+                                            <strong> permanent record</strong> of each family's details. New members can <strong>register once using our Jotform</strong>, 
+                                            and we'll use that information for all future poojas. This eliminates the need to provide details every time.
+                                        </p>
+                                    </div>
+                                    
+                                    <div className="bg-white p-6 rounded-lg border-l-4 border-orange-400">
+                                        <h3 className="text-xl font-bold text-orange-800 mb-3">🎵 Do you organize cultural programs?</h3>
+                                        <p className="text-gray-700 leading-relaxed">
+                                            <strong>Absolutely!</strong> We regularly host <strong>bhajan concerts, spiritual discourses, Veedhi Bhajans</strong>, 
+                                            and special programs during major festivals like <strong>Maha Shivarathri, Ramanavami, Gokulashtami, and Ayyappa Mandala season</strong>. 
+                                            Renowned artists and spiritual speakers grace our events. Check our <strong>YouTube channel</strong> to watch recordings 
+                                            of past events: <a href="https://www.youtube.com/@DharmaParipalanaSamithi" target="_blank" rel="noopener noreferrer" className="text-orange-700 font-bold underline">DPS Estancia YouTube</a>.
+                                        </p>
+                                    </div>
+                                    
+                                    <div className="bg-orange-50 p-6 rounded-lg border-l-4 border-orange-600">
+                                        <h3 className="text-xl font-bold text-orange-800 mb-3">📖 Can I access prayer texts and parayanam?</h3>
+                                        <p className="text-gray-700 leading-relaxed">
+                                            <strong>Yes!</strong> We've created a <strong>Digital Library of Sacred Resources</strong> with parayanam texts 
+                                            for Pradosham, Sankatahara Chaturthi, Ashtottaram, Trisathi, and more—all in <strong>Tamil script</strong>. 
+                                            These are available as <strong>free downloadable PDFs</strong> on our 
+                                            <button onClick={() => setActiveSection('resources')} className="text-orange-700 font-bold underline ml-1">
+                                                Sacred Resources page
+                                            </button>. You can download, print, and use them during your home worship.
+                                        </p>
+                                    </div>
+                                    
+                                    <div className="bg-white p-6 rounded-lg border-l-4 border-orange-400">
+                                        <h3 className="text-xl font-bold text-orange-800 mb-3">🤝 How can I volunteer or contribute?</h3>
+                                        <p className="text-gray-700 leading-relaxed">
+                                            We always welcome <strong>volunteers</strong> for event coordination, decoration, prasadam distribution, and spreading 
+                                            awareness. If you have skills in music, organizing, or social media, you can contribute greatly! 
+                                            <button onClick={() => setActiveSection('contact')} className="text-orange-700 font-bold underline ml-1">
+                                                Contact us
+                                            </button> expressing your interest, and we'll be happy to involve you in our activities.
+                                        </p>
+                                    </div>
+                                    
+                                    <div className="bg-orange-50 p-6 rounded-lg border-l-4 border-orange-600">
+                                        <h3 className="text-xl font-bold text-orange-800 mb-3">👶 Are children encouraged to participate?</h3>
+                                        <p className="text-gray-700 leading-relaxed">
+                                            <strong>Absolutely!</strong> We believe in passing down our spiritual heritage to the next generation. Children are 
+                                            encouraged to attend poojas, learn stotrams, participate in bhajans, and help with decorations. Special occasions 
+                                            like <strong>Vinayaka Chaturthi and Gokulashtami</strong> have activities designed especially for kids, including 
+                                            storytelling, prizes for best decorations, and cultural performances.
+                                        </p>
+                                    </div>
+                                    
+                                    <div className="bg-white p-6 rounded-lg border-l-4 border-orange-400">
+                                        <h3 className="text-xl font-bold text-orange-800 mb-3">📱 How do I stay updated about events?</h3>
+                                        <p className="text-gray-700 leading-relaxed mb-3">
+                                            You can stay updated by:
+                                        </p>
+                                        <ul className="text-gray-700 space-y-2 ml-6 list-disc">
+                                            <li>Visiting our <strong>website regularly</strong> (bookmark this page!)</li>
+                                            <li>Subscribing to our <strong>YouTube channel</strong> for event recordings</li>
+                                            <li>Following our <strong>Instagram</strong> for live updates and photos</li>
+                                            <li><strong>Estancia residents</strong> receive WhatsApp notifications via community groups</li>
+                                            <li>Emailing us at <strong>dps.info@zohomail.in</strong> to join our mailing list</li>
+                                        </ul>
+                                    </div>
+                                    
+                                    <div className="bg-orange-50 p-6 rounded-lg border-l-4 border-orange-600">
+                                        <h3 className="text-xl font-bold text-orange-800 mb-3">❔ I have a different question. How do I ask?</h3>
+                                        <p className="text-gray-700 leading-relaxed mb-4">
+                                            We're here to help! Please feel free to reach out to us through our 
+                                            <button onClick={() => setActiveSection('contact')} className="text-orange-700 font-bold underline mx-1">
+                                                Contact Us page
+                                            </button> 
+                                            or email <strong>dps.info@zohomail.in</strong>. We typically respond within 24-48 hours.
+                                        </p>
+                                        <div className="text-center">
+                                            <button 
+                                                onClick={() => setActiveSection('contact')} 
+                                                className="bg-orange-700 text-white px-8 py-3 rounded-lg font-bold hover:bg-orange-800 inline-block"
+                                            >
+                                                📧 Contact Us
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div className="bg-orange-50 p-6 rounded-lg border-l-4 border-orange-500 mt-8 text-center">
+                                    <p className="text-lg text-gray-700">
+                                        <strong>Still have questions?</strong> Don't hesitate to reach out—we're a community built on openness, kindness, and shared devotion. 
+                                        No question is too small! 🙏
+                                    </p>
+                                </div>
+                            </div>
+                        )}
+                        
                         {/* Contact Section */}
                         {activeSection === 'contact' && (
                             <div className="bg-white rounded-xl shadow-lg p-8">

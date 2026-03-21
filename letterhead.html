@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dharma Paripalana Samithi Letterhead</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 0;
+        }
+
+        body {
+            font-family: 'Garamond', 'Times New Roman', serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+
+        .page {
+            width: 210mm;
+            min-height: 297mm;
+            padding: 12mm 15mm;
+            margin: 10mm auto;
+            background: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            position: relative;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header Section */
+        header {
+            display: flex;
+            align-items: center;
+            border-bottom: 2px solid #800000;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        .header-logo {
+            width: 85px; 
+            height: auto;
+            margin-right: 15px;
+        }
+
+        .header-text {
+            flex-grow: 1;
+            text-align: center;
+            margin-right: 100px; 
+        }
+
+        header h1 {
+            margin: 0;
+            color: #800000;
+            font-size: 19px; /* Fixed at requested 19px */
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        header p {
+            margin: 2px 0 0;
+            color: #FF9933;
+            font-weight: bold;
+            font-size: 10pt;
+        }
+
+        /* Main Layout */
+        .main-layout {
+            display: flex;
+            flex: 1;
+        }
+
+        /* Tight Left Sidebar */
+        .sidebar {
+            width: 22%;
+            border-right: 1px solid #eee;
+            padding-right: 12px;
+            font-size: 9pt;
+            color: #333;
+            line-height: 1.3;
+        }
+
+        .sidebar h3 {
+            color: #800000;
+            font-size: 10pt;
+            margin-bottom: 5px;
+            border-bottom: 1px solid #FF9933;
+            padding-bottom: 1px;
+            margin-top: 10px;
+            text-transform: uppercase;
+        }
+
+        .trustee-group {
+            margin-bottom: 8px;
+        }
+
+        .role {
+            font-weight: bold;
+            color: #666;
+            display: block;
+            font-size: 7pt;
+            text-transform: uppercase;
+        }
+
+        /* Full Height Content Area */
+        .letter-content {
+            width: 78%;
+            padding-left: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Footer Section */
+        footer {
+            border-top: 2px solid #FF9933;
+            padding-top: 8px;
+            margin-top: auto;
+            text-align: center;
+            font-size: 9pt;
+            color: #444;
+        }
+
+        .footer-address {
+            font-weight: bold;
+            margin-bottom: 3px;
+        }
+
+        @media print {
+            body { background: none; }
+            .page { margin: 0; box-shadow: none; }
+            header img { -webkit-print-color-adjust: exact; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="page">
+        <header>
+            <img src="images/logo.png" alt="DPS Logo" class="header-logo" onerror="this.style.display='none'">
+            <div class="header-text">
+                <h1>Dharma Paripalana Samithi Estancia</h1>
+                <p>(A Registered Charitable Trust - Regn# 187/2021)</p>
+            </div>
+        </header>
+
+        <div class="main-layout">
+            <div class="sidebar">
+                <h3 style="margin-top: 0;">Trustees</h3>
+                <div class="trustee-group">
+                    <strong>Sri. Rammohan</strong>
+                    <span class="role">Managing Trustee</span>
+                </div>
+                <div class="trustee-group">
+                    <strong>Sri. Gurumurthy</strong>
+                    <span class="role">Dep. Managing Trustee</span>
+                </div>
+                <div class="trustee-group">
+                    <strong>Sri. A.S. Prasad</strong>
+                    <span class="role">Secretary</span>
+                </div>
+                <div class="trustee-group">
+                    <strong>Sri. Ramesh Jayaram</strong>
+                    <span class="role">Treasurer</span>
+                </div>
+                <div class="trustee-group">
+                    <strong>Sri. Rajakumar</strong>
+                    <span class="role">Joint Treasurer</span>
+                </div>
+                <div class="trustee-group">
+                    <strong>Sri. K.V. Suresh</strong>
+                    <span class="role">Author</span>
+                </div>
+                <div class="trustee-group">
+                    <strong>Sri. Kousik Ganesh</strong><br/>
+                    <strong>Sri. Sabarirajan</strong><br/>
+                    <strong>Sri. Pattabhiraman</strong><br/>
+                    <strong>Sri. Krishnan</strong><br/>
+                    <strong>Sri. Venkata Krishnan</strong><br/>
+                    <strong>Sri. Ganesan</strong><br/>
+                    <strong>Sri. BhagavanDoss</strong><br/>
+                    <strong>Sri. Velavan</strong><br/>
+                    <strong>Sri. Sivakumar</strong><br/>
+                    <strong>Sri. Narayanan</strong>
+                </div>
+
+                <h3>Advisor</h3>
+                <div class="trustee-group">
+                    <strong>Sri. Rajib Hota</strong>
+                    <span class="role">Retd. Income Tax Comm.</span>
+                </div>
+            </div>
+
+            <div class="letter-content"> 
+                <!-- Main content goes here -->
+            </div>
+        </div>
+        <footer>
+            <div class="footer-address">
+                # 5137 Estancia Apartments, GST Road, Vallanchery, Guduvanchery (PO), Tamil Nadu - 603202.
+            </div>
+            <div>
+                Ph: +91-98407 18054 | Email: dps.info@zohomail.in | dps.estancia@gmail.com
+            </div>
+        </footer>
+    </div>
+
+</body>
+</html>
